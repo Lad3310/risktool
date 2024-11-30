@@ -9,6 +9,7 @@ import TradesTable from './TradesTable';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import MetricCard from './MetricCard';
+import PerformanceCards from './PerformanceCards';
 
 function Dashboard() {
   const { trades, loading, error } = useTrades();
@@ -46,11 +47,12 @@ function Dashboard() {
     }, {});
 
     const exposureData = Object.entries(counterpartyExposure)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, isMobile ? 3 : undefined)
       .map(([name, value]) => ({
-        name,
+        name: isMobile ? name.slice(0, 6) + (name.length > 6 ? '..' : '') : name,
         value
-      }))
-      .sort((a, b) => b.value - a.value); // Sort by value descending
+      }));
 
     // Add buy/sell metrics
     const buyTrades = unsettledTrades.filter(t => t.buy_sell_indicator?.toLowerCase() === 'buy');
@@ -69,7 +71,7 @@ function Dashboard() {
       buyValue,
       sellValue
     };
-  }, [trades]);
+  }, [trades, isMobile]);
 
   const handleCardClick = (filter) => {
     setSelectedFilter(filter);
@@ -96,6 +98,9 @@ function Dashboard() {
           width: '100%'
         }}
       >
+        <Grid item xs={12}>
+          <PerformanceCards />
+        </Grid>
         <Grid item xs={12} sm={6} md={4}>
           <MetricCard 
             title="Unsettled Trades"
@@ -143,10 +148,11 @@ function Dashboard() {
 
         <Grid item xs={12}>
           <Paper sx={{ 
-            p: { xs: 1, sm: 2, md: 3 }, 
-            height: { xs: 300, sm: 400 },
+            p: { xs: 2, sm: 3 }, 
+            height: { xs: 400, sm: 500 },
             display: 'flex',
-            flexDirection: 'column'
+            flexDirection: 'column',
+            mb: 3
           }}>
             <Typography variant="h6" color="text.secondary" gutterBottom>
               Counterparty Exposure
@@ -160,18 +166,39 @@ function Dashboard() {
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart 
                     data={metrics.exposureData}
-                    margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                    margin={{ 
+                      top: 20, 
+                      right: 20, 
+                      left: isMobile ? 40 : 60, 
+                      bottom: isMobile ? 80 : 20 
+                    }}
                   >
                     <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
+                    <XAxis 
+                      dataKey="name" 
+                      angle={isMobile ? -45 : 0}
+                      textAnchor={isMobile ? "end" : "middle"}
+                      height={isMobile ? 60 : 30}
+                      interval={0}
+                      tick={{ 
+                        fontSize: isMobile ? 10 : 12,
+                        dy: isMobile ? 10 : 0,
+                        fill: '#64748b'
+                      }}
+                      axisLine={{ stroke: '#e2e8f0' }}
+                      tickLine={{ stroke: '#e2e8f0' }}
+                    />
+                    <YAxis 
+                      tickFormatter={(value) => `$${value / 1000000}M`}
+                      width={60}
+                    />
                     <Tooltip 
                       formatter={(value) => formatCurrency(value)}
                       contentStyle={{ borderRadius: 8 }}
                     />
                     <Legend verticalAlign="bottom" height={36} />
                     <Bar 
-                      dataKey="value" 
+                      dataKey="value"
                       fill="#4ade80" 
                       name="Exposure" 
                       radius={[4, 4, 0, 0]}

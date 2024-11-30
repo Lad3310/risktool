@@ -12,11 +12,22 @@ import {
   MenuItem,
   Grid,
   Typography,
-  Box
+  Box,
+  Button
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useMediaQuery } from '@mui/material';
 import ExportButtons from './ExportButtons';
+import styled from '@emotion/styled';
+import DownloadIcon from '@mui/icons-material/Download';
+import * as XLSX from 'xlsx';
+
+const ExportButtonsContainer = styled(Box)({
+  display: 'flex',
+  gap: '8px',
+  justifyContent: 'flex-end',
+  marginBottom: '16px'
+});
 
 function TradesTable({ trades, initialFilter, id }) {
   const [page, setPage] = useState(0);
@@ -28,6 +39,7 @@ function TradesTable({ trades, initialFilter, id }) {
     endDate: '',
     type: initialFilter?.type || 'all'
   });
+  const [data, setData] = useState([]);
 
   useEffect(() => {
     if (initialFilter) {
@@ -39,6 +51,20 @@ function TradesTable({ trades, initialFilter, id }) {
       setPage(0);
     }
   }, [initialFilter]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch('/api/trades');
+        const result = await response.json();
+        setData(result);
+      } catch (error) {
+        console.error('Error fetching trades:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const counterparties = ['all', ...new Set(trades.map(trade => trade.counterparty_name))];
   
@@ -83,11 +109,13 @@ function TradesTable({ trades, initialFilter, id }) {
 
   return (
     <Paper id={id} sx={{ p: { xs: 1, sm: 2, md: 3 }, mt: 3 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-        <Typography variant="h6">
-          Trade Details
-        </Typography>
-        <ExportButtons data={filteredTrades} />
+      <Box sx={{ width: '100%', mb: 2 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+          <Typography variant="h6">
+            Trade Details
+          </Typography>
+          <ExportButtons data={filteredTrades} />
+        </Box>
       </Box>
       
       <Grid container spacing={2} sx={{ mb: 3 }}>
