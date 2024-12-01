@@ -9,7 +9,6 @@ import TradesTable from './TradesTable';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import MetricCard from './MetricCard';
-import PerformanceCards from './PerformanceCards';
 
 function Dashboard() {
   const { trades, loading, error } = useTrades();
@@ -83,8 +82,13 @@ function Dashboard() {
     return <Alert severity="error">{error}</Alert>;
   }
 
-  const formatCurrency = (value) => 
-    value ? `$${(value / 1000000).toFixed(2)}M` : '$0.00M';
+  const formatCurrency = (value) => {
+    // Format as full dollar amount with commas and 2 decimal places
+    return value ? `$${value.toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    })}` : '$0.00';
+  };
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -98,9 +102,6 @@ function Dashboard() {
           width: '100%'
         }}
       >
-        <Grid item xs={12}>
-          <PerformanceCards />
-        </Grid>
         <Grid item xs={12} sm={6} md={4}>
           <MetricCard 
             title="Unsettled Trades"

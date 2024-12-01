@@ -13,23 +13,12 @@ import {
   Grid,
   Typography,
   Box,
-  Button
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useMediaQuery } from '@mui/material';
 import ExportButtons from './ExportButtons';
-import styled from '@emotion/styled';
-import DownloadIcon from '@mui/icons-material/Download';
-import * as XLSX from 'xlsx';
 
-const ExportButtonsContainer = styled(Box)({
-  display: 'flex',
-  gap: '8px',
-  justifyContent: 'flex-end',
-  marginBottom: '16px'
-});
-
-function TradesTable({ trades, initialFilter, id }) {
+function TradesTable({ trades = [], initialFilter, id }) {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [filters, setFilters] = useState({
@@ -39,7 +28,6 @@ function TradesTable({ trades, initialFilter, id }) {
     endDate: '',
     type: initialFilter?.type || 'all'
   });
-  const [data, setData] = useState([]);
 
   useEffect(() => {
     if (initialFilter) {
@@ -52,25 +40,11 @@ function TradesTable({ trades, initialFilter, id }) {
     }
   }, [initialFilter]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch('/api/trades');
-        const result = await response.json();
-        setData(result);
-      } catch (error) {
-        console.error('Error fetching trades:', error);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  const counterparties = ['all', ...new Set(trades.map(trade => trade.counterparty_name))];
+  const counterparties = ['all', ...new Set(trades.map(trade => trade.counterparty_name || 'Unknown'))];
   
   const filteredTrades = trades.filter(trade => {
     if (filters.settlementStatus !== 'all' && 
-        trade.settlement_status?.toLowerCase() !== filters.settlementStatus) return false;
+        trade.settlement_status?.toLowerCase() !== filters.settlementStatus?.toLowerCase()) return false;
     if (filters.type !== 'all' && 
         trade.buy_sell_indicator !== filters.type) return false;
     if (filters.counterparty !== 'all' && 
@@ -106,6 +80,13 @@ function TradesTable({ trades, initialFilter, id }) {
   };
 
   const visibleColumns = getVisibleColumns();
+
+  const formatCurrency = (value) => {
+    return value ? value.toLocaleString('en-US', {
+      style: 'currency',
+      currency: 'USD'
+    }) : '$0.00';
+  };
 
   return (
     <Paper id={id} sx={{ p: { xs: 1, sm: 2, md: 3 }, mt: 3 }}>
@@ -186,7 +167,7 @@ function TradesTable({ trades, initialFilter, id }) {
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredTrades
+            {(filteredTrades || [])
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((trade) => (
                 <TableRow key={trade.id}>
@@ -201,9 +182,9 @@ function TradesTable({ trades, initialFilter, id }) {
                   {visibleColumns.includes('type') && <TableCell>{trade.buy_sell_indicator}</TableCell>}
                   {visibleColumns.includes('counterparty') && <TableCell>{trade.counterparty_name}</TableCell>}
                   {visibleColumns.includes('product') && <TableCell>{trade.product_type}</TableCell>}
-                  {visibleColumns.includes('quantity') && <TableCell align="right">{trade.quantity.toLocaleString()}</TableCell>}
-                  {visibleColumns.includes('price') && <TableCell align="right">${trade.price.toFixed(2)}</TableCell>}
-                  {visibleColumns.includes('net_amount') && <TableCell align="right">${trade.net_money.toLocaleString()}</TableCell>}
+                  {visibleColumns.includes('quantity') && <TableCell align="right">{trade.quantity?.toLocaleString()}</TableCell>}
+                  {visibleColumns.includes('price') && <TableCell align="right">{formatCurrency(trade.price)}</TableCell>}
+                  {visibleColumns.includes('net_amount') && <TableCell align="right">{formatCurrency(trade.net_money)}</TableCell>}
                   {visibleColumns.includes('status') && <TableCell>{trade.settlement_status}</TableCell>}
                 </TableRow>
               ))}
