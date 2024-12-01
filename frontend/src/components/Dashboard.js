@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Grid, Paper, Typography, Box, CircularProgress, Alert } from '@mui/material';
+import { Grid, Paper, Typography, Box, CircularProgress, Alert, Button } from '@mui/material';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
   ResponsiveContainer
@@ -9,6 +9,9 @@ import TradesTable from './TradesTable';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import MetricCard from './MetricCard';
+import { useAuth } from '../context/AuthContext';
+import { Settings } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
 
 function Dashboard() {
   const { 
@@ -22,6 +25,8 @@ function Dashboard() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [selectedFilter, setSelectedFilter] = useState(null);
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   const metrics = useMemo(() => {
     if (!trades?.length) return {
@@ -99,6 +104,15 @@ function Dashboard() {
 
   return (
     <Box sx={{ flexGrow: 1 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
+        <Button
+          startIcon={<Settings />}
+          onClick={() => navigate('/settings/alerts')}
+          variant="outlined"
+        >
+          Alert Settings
+        </Button>
+      </Box>
       <Grid 
         container 
         spacing={{ xs: 1, sm: 2 }} 
@@ -211,6 +225,7 @@ function Dashboard() {
             subtitle="Number and value of unsettled buy trades"
             loading={loading}
             onClick={() => handleCardClick({ type: 'Buy' })}
+            type="buy"
           />
         </Grid>
         <Grid item xs={12} sm={6}>
@@ -220,6 +235,7 @@ function Dashboard() {
             subtitle="Number and value of unsettled sell trades"
             loading={loading}
             onClick={() => handleCardClick({ type: 'Sell' })}
+            type="sell"
           />
         </Grid>
 

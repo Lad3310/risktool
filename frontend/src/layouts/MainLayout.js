@@ -20,7 +20,9 @@ function MainLayout() {
           mt: 8,
           ml: { xs: 0, sm: 26 },
           width: { xs: '100%', sm: `calc(100% - 240px)` },
-          backgroundColor: '#f5f5f5'
+          backgroundColor: '#f5f5f5',
+          position: 'relative',
+          overflow: 'hidden'
         }}
       >
         <Outlet />
