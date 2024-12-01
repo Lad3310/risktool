@@ -110,5 +110,66 @@ export function useTrades() {
     settlement_status: trade.settlement_status?.toLowerCase() || 'unknown'
   });
 
-  return { trades, loading, error };
+  const getCounterpartyExposure = (trades) => {
+    const exposureByCounterparty = trades.reduce((acc, trade) => {
+      const { counterparty_name, net_money } = trade;
+      acc[counterparty_name] = (acc[counterparty_name] || 0) + parseFloat(net_money);
+      return acc;
+    }, {});
+
+    const sortedCounterparties = Object.entries(exposureByCounterparty)
+      .sort(([, a], [, b]) => b - a);
+
+    return sortedCounterparties.length > 0 
+      ? { name: sortedCounterparties[0][0], amount: sortedCounterparties[0][1] }
+      : { name: 'N/A', amount: 0 };
+  };
+
+  const getCounterpartyTradeCount = (trades) => {
+    const tradesByCounterparty = trades.reduce((acc, trade) => {
+      const { counterparty_name, buy_sell_indicator } = trade;
+      if (!acc[counterparty_name]) {
+        acc[counterparty_name] = { buy: 0, sell: 0 };
+      }
+      acc[counterparty_name][buy_sell_indicator.toLowerCase()] += 1;
+      return acc;
+    }, {});
+
+    const sortedByTotal = Object.entries(tradesByCounterparty)
+      .sort(([, a], [, b]) => (b.buy + b.sell) - (a.buy + a.sell));
+
+    return sortedByTotal.length > 0
+      ? { 
+          name: sortedByTotal[0][0], 
+          buyCount: sortedByTotal[0][1].buy, 
+          sellCount: sortedByTotal[0][1].sell,
+          total: sortedByTotal[0][1].buy + sortedByTotal[0][1].sell
+        }
+      : { name: 'N/A', buyCount: 0, sellCount: 0, total: 0 };
+  };
+
+  const getTopFails = (trades) => {
+    const failedTrades = trades
+      .filter(trade => trade.settlement_status?.toLowerCase() === 'unsettled')
+      .sort((a, b) => Math.abs(b.net_money) - Math.abs(a.net_money))
+      .slice(0, 3)
+      .map(trade => ({
+        type: trade.buy_sell_indicator,
+        quantity: trade.quantity?.toLocaleString() || '0',
+        date: new Date(trade.settlement_date).toLocaleDateString(),
+        amount: Math.abs(trade.net_money),
+        counterparty: trade.counterparty_name
+      }));
+
+    return failedTrades;
+  };
+
+  return {
+    trades,
+    loading,
+    error,
+    largestCounterpartyExposure: getCounterpartyExposure(trades),
+    largestCounterpartyTradeCount: getCounterpartyTradeCount(trades),
+    topFails: getTopFails(trades),
+  };
 } 

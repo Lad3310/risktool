@@ -2,9 +2,11 @@ import React, { useEffect } from 'react';
 import { Box, Typography, Paper, Grid, CircularProgress, Alert } from '@mui/material';
 import { usePerformanceData } from '../hooks/usePerformanceData';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { useTrades } from '../hooks/useTrades';
 
 function Analytics() {
   const { performanceData, assetAllocation, alerts, loading, error } = usePerformanceData();
+  const { trades, largestCounterpartyExposure, largestCounterpartyTradeCount } = useTrades();
 
   console.log('Analytics Component State:', {
     performanceData,

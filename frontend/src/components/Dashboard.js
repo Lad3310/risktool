@@ -11,7 +11,14 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import MetricCard from './MetricCard';
 
 function Dashboard() {
-  const { trades, loading, error } = useTrades();
+  const { 
+    trades, 
+    loading, 
+    error, 
+    largestCounterpartyExposure, 
+    largestCounterpartyTradeCount,
+    topFails 
+  } = useTrades();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [selectedFilter, setSelectedFilter] = useState(null);
@@ -125,6 +132,75 @@ function Dashboard() {
             value={formatCurrency(metrics.largestExposure)}
             subtitle="Largest counterparty exposure"
             loading={loading}
+          />
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={4}>
+          <MetricCard
+            title="Largest Counterparty Exposure"
+            value={formatCurrency(largestCounterpartyExposure.amount)}
+            subtitle={`Counterparty: ${largestCounterpartyExposure.name}`}
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={4}>
+          <MetricCard
+            title="Most Active Counterparty"
+            value={`${largestCounterpartyTradeCount.total} Trades`}
+            subtitle={`${largestCounterpartyTradeCount.name} (Buy: ${largestCounterpartyTradeCount.buyCount}, Sell: ${largestCounterpartyTradeCount.sellCount})`}
+          />
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={4}>
+          <MetricCard
+            title="Top 3 Largest Fails"
+            value={
+              <Box sx={{ 
+                display: 'flex', 
+                flexDirection: 'column', 
+                gap: 1,
+                fontSize: '0.875rem',
+                minHeight: '100px'
+              }}>
+                {topFails.map((fail, index) => (
+                  <Box 
+                    key={index}
+                    sx={{ 
+                      display: 'flex', 
+                      flexDirection: 'column',
+                      p: 1,
+                      borderRadius: 1,
+                      bgcolor: 'rgba(74, 222, 128, 0.08)',
+                      '&:hover': {
+                        bgcolor: 'rgba(74, 222, 128, 0.12)'
+                      }
+                    }}
+                  >
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <Typography variant="body2" color="text.secondary">
+                        {fail.type} • {fail.quantity}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {fail.date}
+                      </Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 0.5 }}>
+                      <Typography variant="body2" fontWeight="medium">
+                        {fail.counterparty}
+                      </Typography>
+                      <Typography variant="body2" color="error.main" fontWeight="medium">
+                        {formatCurrency(fail.amount)}
+                      </Typography>
+                    </Box>
+                  </Box>
+                ))}
+                {topFails.length === 0 && (
+                  <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center' }}>
+                    No failed trades
+                  </Typography>
+                )}
+              </Box>
+            }
+            subtitle="Largest failed trades by value"
           />
         </Grid>
 
