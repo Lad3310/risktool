@@ -8,6 +8,8 @@ import Login from './components/Login';
 import MainLayout from './layouts/MainLayout';
 import { AuthProvider } from './context/AuthContext';
 import { useAuth } from './context/AuthContext';
+import Reports from './components/Reports';
+import Navigation from './components/Navigation';
 
 // Protected Route wrapper component
 const ProtectedRoute = ({ children }) => {
@@ -40,9 +42,9 @@ function AppRoutes() {
         <Route index element={<Dashboard />} />
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="analytics" element={<Analytics />} />
-        <Route path="files" element={<div>Files Page</div>} />
         <Route path="contact" element={<Contact />} />
         <Route path="settings/alerts" element={<AlertSettings />} />
+        <Route path="reports" element={<Reports />} />
       </Route>
     </Routes>
   );

@@ -25,7 +25,9 @@ const AlertSettings = () => {
   const [status, setStatus] = useState({ message: '', severity: 'info' });
 
   useEffect(() => {
-    fetchAlertPreferences();
+    if (user?.id) {
+      fetchAlertPreferences();
+    }
   }, [user?.id]);
 
   const fetchAlertPreferences = async () => {
@@ -35,23 +37,41 @@ const AlertSettings = () => {
       const { data, error } = await supabase
         .from('alert_preferences')
         .select('*')
-        .eq('user_id', user.id)
-        .maybeSingle();
+        .eq('user_id', user.id);
 
-      if (error) throw error;
+      if (error) {
+        throw error;
+      }
 
-      if (data) {
-        setEmail(data.email);
+      // If preferences exist, use them
+      if (data && data.length > 0) {
+        const prefs = data[0];
+        setEmail(prefs.email || user.email || '');
         setAlerts({
-          unsettledTradeThreshold: Number(data.unsettled_trade_threshold) || 0,
-          counterpartyTradeThreshold: Number(data.counterparty_trade_threshold) || 10,
+          unsettledTradeThreshold: Number(prefs.unsettled_trade_threshold) || 0,
+          counterpartyTradeThreshold: Number(prefs.counterparty_trade_threshold) || 10,
         });
       } else {
+        // If no preferences exist, set defaults
         setEmail(user.email || '');
         setAlerts({
           unsettledTradeThreshold: 0,
           counterpartyTradeThreshold: 10,
         });
+        
+        // Optionally create default preferences
+        const { error: insertError } = await supabase
+          .from('alert_preferences')
+          .insert({
+            user_id: user.id,
+            email: user.email || '',
+            unsettled_trade_threshold: 0,
+            counterparty_trade_threshold: 10
+          });
+          
+        if (insertError) {
+          console.error('Error creating default preferences:', insertError);
+        }
       }
     } catch (error) {
       console.error('Fetch error:', error);
@@ -65,21 +85,22 @@ const AlertSettings = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setStatus({ message: '', severity: 'info' });
     
     try {
-      // Log the data being sent
       const preferenceData = {
         user_id: user.id,
         email: email,
         unsettled_trade_threshold: Number(alerts.unsettledTradeThreshold),
         counterparty_trade_threshold: Number(alerts.counterpartyTradeThreshold),
+        updated_at: new Date().toISOString()
       };
-      
-      console.log('Saving preferences:', preferenceData);
 
       const { error } = await supabase
         .from('alert_preferences')
-        .upsert(preferenceData);
+        .upsert(preferenceData, {
+          onConflict: 'user_id'
+        });
 
       if (error) throw error;
       
@@ -144,7 +165,7 @@ const AlertSettings = () => {
               value={alerts.unsettledTradeThreshold}
               onChange={(e) => setAlerts({
                 ...alerts,
-                unsettledTradeThreshold: parseInt(e.target.value)
+                unsettledTradeThreshold: parseInt(e.target.value) || 0
               })}
               fullWidth
               InputProps={{
@@ -159,7 +180,7 @@ const AlertSettings = () => {
               value={alerts.counterpartyTradeThreshold}
               onChange={(e) => setAlerts({
                 ...alerts,
-                counterpartyTradeThreshold: parseInt(e.target.value)
+                counterpartyTradeThreshold: parseInt(e.target.value) || 0
               })}
               fullWidth
               helperText="Get notified when number of trades with a counterparty exceeds this number"

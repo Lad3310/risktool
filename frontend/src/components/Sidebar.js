@@ -11,7 +11,7 @@ import {
 } from '@mui/material';
 import { Link } from 'react-router-dom';
 import DashboardIcon from '@mui/icons-material/Dashboard';
-import DescriptionIcon from '@mui/icons-material/Description';
+import AssessmentIcon from '@mui/icons-material/Assessment';
 import AnalyticsIcon from '@mui/icons-material/Analytics';
 import ContactSupportIcon from '@mui/icons-material/ContactSupport';
 
@@ -23,7 +23,7 @@ function Sidebar({ mobileOpen, setMobileOpen }) {
 
   const menuItems = [
     { text: 'Dashboard', icon: <DashboardIcon />, path: '/' },
-    { text: 'Files', icon: <DescriptionIcon />, path: '/files' },
+    { text: 'Reports', icon: <AssessmentIcon />, path: '/reports' },
     { text: 'Analytics', icon: <AnalyticsIcon />, path: '/analytics' },
     { text: 'Contact', icon: <ContactSupportIcon />, path: '/contact' }
   ];
