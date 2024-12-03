@@ -324,7 +324,13 @@ function Dashboard() {
         {/* Counterparty Exposure Chart */}
         <Grid container spacing={2} sx={{ mt: 0 }}>
           <Grid item xs={12}>
-            <Paper sx={{ p: { xs: 2, sm: 3 }, height: { xs: 400, sm: 500 } }}>
+            <Paper sx={{ 
+              p: { xs: 2, sm: 3 }, 
+              height: { xs: 400, sm: 500 },
+              display: 'flex',
+              flexDirection: 'column',
+              mb: 3
+            }}>
               <Typography variant="h6" color="text.secondary" gutterBottom>
                 Counterparty Exposure
               </Typography>
