@@ -1,5 +1,6 @@
 import React from 'react';
 import { Paper, Typography, Box } from '@mui/material';
+import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 
 function MetricCard({ title, value, subtitle, loading, onClick, type }) {
   // Function to determine text color based on type
@@ -27,19 +28,42 @@ function MetricCard({ title, value, subtitle, loading, onClick, type }) {
       sx={{ 
         p: 3, 
         cursor: onClick ? 'pointer' : 'default',
-        '&:hover': onClick ? {
-          backgroundColor: type === 'buy' 
-            ? 'rgba(59, 130, 246, 0.08)' // Blue hover
-            : type === 'sell' 
-            ? 'rgba(239, 68, 68, 0.08)' // Red hover
-            : 'rgba(74, 222, 128, 0.08)', // Default hover
-          transform: 'translateY(-2px)',
-        } : {},
+        position: 'relative',
+        '&:hover': {
+          ...onClick ? {
+            backgroundColor: type === 'buy' 
+              ? 'rgba(59, 130, 246, 0.08)'
+              : type === 'sell' 
+              ? 'rgba(239, 68, 68, 0.08)'
+              : 'rgba(74, 222, 128, 0.08)',
+            transform: 'translateY(-2px)',
+          } : {},
+          '& .drag-handle': {
+            opacity: 1
+          }
+        },
         transition: 'all 0.2s ease-in-out'
       }}
       onClick={onClick}
       elevation={1}
     >
+      <Box 
+        className="drag-handle"
+        sx={{ 
+          position: 'absolute',
+          top: 8,
+          right: 8,
+          opacity: 0,
+          transition: 'opacity 0.2s',
+          cursor: 'grab',
+          color: 'text.secondary',
+          '&:hover': {
+            color: 'primary.main'
+          }
+        }}
+      >
+        <DragIndicatorIcon />
+      </Box>
       <Typography 
         variant="h6" 
         color={type ? getValueColor() : 'text.secondary'} 
