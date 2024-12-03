@@ -24,6 +24,7 @@ export function useTrades() {
             counterparty_name,
             settlement_date,
             settlement_status,
+            settlement_location,
             net_money
           `)
           .order('settlement_date', { ascending: false });
@@ -107,22 +108,44 @@ export function useTrades() {
     price: Number(trade.price) || 0,
     net_money: Number(trade.net_money) || 0,
     settlement_date: trade.settlement_date ? new Date(trade.settlement_date).toISOString() : null,
-    settlement_status: trade.settlement_status?.toLowerCase() || 'unknown'
+    settlement_status: trade.settlement_status?.toLowerCase() || 'unknown',
+    settlement_location: trade.settlement_location || 'Unknown'
   });
 
   const getCounterpartyExposure = (trades) => {
     const exposureByCounterparty = trades.reduce((acc, trade) => {
-      const { counterparty_name, net_money } = trade;
-      acc[counterparty_name] = (acc[counterparty_name] || 0) + parseFloat(net_money);
+      const { counterparty_name, net_money, settlement_location } = trade;
+      if (!acc[counterparty_name]) {
+        acc[counterparty_name] = {
+          amount: 0,
+          locations: {
+            Fed: 0,
+            DTC: 0,
+            Euroclear: 0
+          }
+        };
+      }
+      acc[counterparty_name].amount += parseFloat(net_money);
+      if (settlement_location && trade.settlement_status?.toLowerCase() === 'unsettled') {
+        acc[counterparty_name].locations[settlement_location] += 1;
+      }
       return acc;
     }, {});
 
     const sortedCounterparties = Object.entries(exposureByCounterparty)
-      .sort(([, a], [, b]) => b - a);
+      .sort(([, a], [, b]) => b.amount - a.amount);
 
     return sortedCounterparties.length > 0 
-      ? { name: sortedCounterparties[0][0], amount: sortedCounterparties[0][1] }
-      : { name: 'N/A', amount: 0 };
+      ? { 
+          name: sortedCounterparties[0][0], 
+          amount: sortedCounterparties[0][1].amount,
+          locationCounts: sortedCounterparties[0][1].locations
+        }
+      : { 
+          name: 'N/A', 
+          amount: 0,
+          locationCounts: { Fed: 0, DTC: 0, Euroclear: 0 }
+        };
   };
 
   const getCounterpartyTradeCount = (trades) => {
@@ -164,6 +187,53 @@ export function useTrades() {
     return failedTrades;
   };
 
+  const getUnsettledByLocation = (trades) => {
+    console.log('All trades:', trades.length);
+    
+    const unsettledTrades = trades.filter(trade => 
+      trade.settlement_status?.toLowerCase() === 'unsettled'
+    );
+    console.log('Unsettled trades:', unsettledTrades.length);
+
+    // Debug: Log first few trades with their locations
+    unsettledTrades.slice(0, 3).forEach(trade => {
+      console.log('Trade details:', {
+        id: trade.id,
+        status: trade.settlement_status,
+        location: trade.settlement_location,
+        amount: trade.net_money
+      });
+    });
+
+    const locationStats = unsettledTrades.reduce((acc, trade) => {
+      const location = trade.settlement_location;
+      console.log('Processing location:', location, typeof location);
+      
+      if (!location) {
+        console.log('Missing location for trade:', trade.id);
+      }
+      
+      const locationKey = location || 'Unknown';
+      if (!acc[locationKey]) {
+        acc[locationKey] = { count: 0, amount: 0 };
+      }
+      acc[locationKey].count += 1;
+      acc[locationKey].amount += Math.abs(trade.net_money || 0);
+      return acc;
+    }, {});
+
+    const result = Object.entries(locationStats)
+      .sort((a, b) => b[1].amount - a[1].amount)
+      .map(([location, stats]) => ({
+        location,
+        count: stats.count,
+        amount: stats.amount
+      }));
+
+    console.log('Final location stats:', result);
+    return result;
+  };
+
   return {
     trades,
     loading,
@@ -171,5 +241,6 @@ export function useTrades() {
     largestCounterpartyExposure: getCounterpartyExposure(trades),
     largestCounterpartyTradeCount: getCounterpartyTradeCount(trades),
     topFails: getTopFails(trades),
+    unsettledByLocation: getUnsettledByLocation(trades),
   };
 } 
