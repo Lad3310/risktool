@@ -26,7 +26,10 @@ import MoneyOffOutlinedIcon from '@mui/icons-material/MoneyOffOutlined';
 import { LogoutOutlined } from '@mui/icons-material';
 import { supabase } from '../utils/supabaseClient';
 
-const drawerWidth = 240;
+const drawerWidth = {
+  xs: 200,
+  sm: 240,
+};
 
 export default function Navigation({ mobileOpen, setMobileOpen }) {
   const navigate = useNavigate();
@@ -190,10 +193,10 @@ export default function Navigation({ mobileOpen, setMobileOpen }) {
       <Box
         component="nav"
         sx={{ 
-          width: drawerWidth,
+          width: { xs: drawerWidth.xs, sm: drawerWidth.sm },
           flexShrink: 0,
           '& .MuiDrawer-paper': {
-            width: drawerWidth,
+            width: { xs: drawerWidth.xs, sm: drawerWidth.sm },
             boxSizing: 'border-box',
             borderRight: '1px solid rgba(0, 0, 0, 0.08)',
             backgroundColor: '#fff',

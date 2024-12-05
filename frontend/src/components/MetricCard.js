@@ -18,7 +18,7 @@ function MetricCard({ title, value, subtitle, loading, onClick, type }) {
   return (
     <Paper 
       sx={{ 
-        p: 3, 
+        p: { xs: 1.5, sm: 2 },
         cursor: onClick ? 'pointer' : 'default',
         position: 'relative',
         height: '100%',

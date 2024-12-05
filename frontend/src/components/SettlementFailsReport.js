@@ -243,18 +243,18 @@ function SettlementFailsReport() {
 
   return (
     <Box sx={{ 
-      p: { xs: 1, sm: 3 },
+      p: { xs: 0.5, sm: 1 },
       maxWidth: '100%',
       overflow: 'hidden',
     }}>
       <Box sx={{ 
-        p: { xs: 1, sm: 3 },
+        p: { xs: 0.5, sm: 1 },
         display: 'flex', 
         flexDirection: { xs: 'column', sm: 'row' },
         justifyContent: 'space-between', 
         alignItems: { xs: 'flex-start', sm: 'center' },
-        mb: { xs: 2, sm: 3 },
-        gap: { xs: 1, sm: 2 }
+        mb: { xs: 1, sm: 2 },
+        gap: { xs: 0.5, sm: 1 }
       }}>
         <Typography 
           variant="h5" 

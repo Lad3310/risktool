@@ -449,11 +449,11 @@ function Dashboard() {
           {(provided) => (
             <Grid 
               container 
-              spacing={2}
+              spacing={1}
               sx={{ 
-                mb: { xs: 1, sm: 3 },
-                mx: { xs: 0, sm: -2 },
-                width: { xs: '100%', sm: 'calc(100% + 32px)' },
+                mb: { xs: 1, sm: 2 },
+                mx: 0,
+                width: '100%',
                 overflow: 'hidden',
               }}
               {...provided.droppableProps}
@@ -478,7 +478,9 @@ function Dashboard() {
                           height: '100%'
                         }}
                       >
-                        {cardComponents[cardId]}
+                        <Box sx={{ p: { xs: 0.5, sm: 1 } }}>
+                          {cardComponents[cardId]}
+                        </Box>
                       </Box>
                     </Grid>
                   )}
@@ -494,10 +496,10 @@ function Dashboard() {
           {(provided) => (
             <Grid 
               container 
-              spacing={2}
+              spacing={1}
               sx={{ 
-                mx: { xs: 0, sm: -2 },
-                width: { xs: '100%', sm: 'calc(100% + 32px)' },
+                mx: 0,
+                width: '100%',
                 overflow: 'hidden',
               }}
               {...provided.droppableProps}
@@ -522,7 +524,9 @@ function Dashboard() {
                           height: '100%'
                         }}
                       >
-                        {cardComponents[cardId]}
+                        <Box sx={{ p: { xs: 0.5, sm: 1 } }}>
+                          {cardComponents[cardId]}
+                        </Box>
                       </Box>
                     </Grid>
                   )}
@@ -537,11 +541,11 @@ function Dashboard() {
       {/* Counterparty Exposure Chart */}
       <Grid 
         container 
-        spacing={2}
+        spacing={1}
         sx={{ 
           mt: 0, 
-          mx: { xs: 0, sm: -2 },
-          width: { xs: '100%', sm: 'calc(100% + 32px)' },
+          mx: 0,
+          width: '100%',
           overflow: 'hidden',
         }}
       >
@@ -618,11 +622,11 @@ function Dashboard() {
       {/* Trades Table */}
       <Grid 
         container 
-        spacing={2}
+        spacing={1}
         sx={{ 
           mt: 0, 
-          mx: { xs: 0, sm: -2 },
-          width: { xs: '100%', sm: 'calc(100% + 32px)' },
+          mx: 0,
+          width: '100%',
           overflow: 'hidden',
         }}
       >
