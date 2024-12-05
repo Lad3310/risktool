@@ -71,46 +71,85 @@ function SettlementFailsReport() {
     <Card 
       key={fail.id}
       sx={{
-        p: 2,
+        p: 3,
         mb: 2,
         boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.05)',
         '&:last-child': { mb: 0 }
       }}
     >
-      <Stack spacing={1}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Typography variant="subtitle2" color="text.secondary">
+      <Stack spacing={2}>
+        <Box sx={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center',
+          borderBottom: '1px solid rgba(0, 0, 0, 0.08)',
+          pb: 1
+        }}>
+          <Typography variant="subtitle1" color="text.secondary">
             Counterparty
           </Typography>
-          <Typography>{fail.counterparty_name}</Typography>
+          <Typography variant="subtitle1" sx={{ fontWeight: 500 }}>
+            {fail.counterparty_name}
+          </Typography>
         </Box>
         
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Typography variant="subtitle2" color="text.secondary">
+        <Box sx={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center',
+          borderBottom: '1px solid rgba(0, 0, 0, 0.08)',
+          pb: 1
+        }}>
+          <Typography variant="subtitle1" color="text.secondary">
             Date
           </Typography>
-          <Typography>{formatDate(fail.settlement_date)}</Typography>
+          <Typography variant="subtitle1" sx={{ fontWeight: 500 }}>
+            {formatDate(fail.settlement_date)}
+          </Typography>
         </Box>
         
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Typography variant="subtitle2" color="text.secondary">
+        <Box sx={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center',
+          borderBottom: '1px solid rgba(0, 0, 0, 0.08)',
+          pb: 1
+        }}>
+          <Typography variant="subtitle1" color="text.secondary">
             Days
           </Typography>
-          <Typography>{fail.fail_days}</Typography>
+          <Typography variant="subtitle1" sx={{ fontWeight: 500 }}>
+            {fail.fail_days}
+          </Typography>
         </Box>
         
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Typography variant="subtitle2" color="text.secondary">
+        <Box sx={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center',
+          borderBottom: '1px solid rgba(0, 0, 0, 0.08)',
+          pb: 1
+        }}>
+          <Typography variant="subtitle1" color="text.secondary">
             Value
           </Typography>
-          <Typography>{formatCurrency(Math.abs(fail.net_money))}</Typography>
+          <Typography variant="subtitle1" sx={{ fontWeight: 500 }}>
+            {formatCurrency(Math.abs(fail.net_money))}
+          </Typography>
         </Box>
         
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Typography variant="subtitle2" color="text.secondary">
+        <Box sx={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center',
+          pb: 1
+        }}>
+          <Typography variant="subtitle1" color="text.secondary">
             Cost
           </Typography>
-          <Typography>{formatCurrency(fail.fail_cost)}</Typography>
+          <Typography variant="subtitle1" sx={{ fontWeight: 500 }}>
+            {formatCurrency(fail.fail_cost)}
+          </Typography>
         </Box>
       </Stack>
     </Card>
@@ -144,27 +183,34 @@ function SettlementFailsReport() {
   return (
     <Box sx={{ p: { xs: 0.5, sm: 3 } }}>
       <Box sx={{ 
+        p: { xs: 2, sm: 3 },
         display: 'flex', 
+        flexDirection: { xs: 'column', sm: 'row' },
         justifyContent: 'space-between', 
-        alignItems: 'center',
+        alignItems: { xs: 'flex-start', sm: 'center' },
         mb: 3,
-        flexWrap: 'wrap',
         gap: 2
       }}>
         <Typography 
           variant="h5" 
           sx={{ 
-            fontSize: { xs: '1.125rem', sm: '1.5rem' },
+            fontSize: { xs: '1.5rem', sm: '1.5rem' },
             fontWeight: 500,
           }}
         >
           Settlement Fail Analysis
         </Typography>
 
-        <ExportButtons 
-          data={settlementFails}
-          filename="settlement-fails"
-        />
+        <Box sx={{ 
+          display: 'flex', 
+          gap: 1,
+          width: { xs: '100%', sm: 'auto' }
+        }}>
+          <ExportButtons 
+            data={settlementFails}
+            filename="settlement-fails"
+          />
+        </Box>
       </Box>
       
       {settlementFails.length === 0 ? (
@@ -174,8 +220,36 @@ function SettlementFailsReport() {
       ) : (
         <>
           {/* Mobile View */}
-          <Box sx={{ display: { xs: 'block', md: 'none' }, px: 1 }}>
+          <Box sx={{ display: { xs: 'block', md: 'none' } }}>
             {paginatedFails.map(renderMobileCard)}
+
+            <Box sx={{ 
+              display: 'flex', 
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              mt: 2,
+              px: 1
+            }}>
+              <Typography variant="body2" color="text.secondary">
+                {`${startIndex + 1}–${Math.min(endIndex, settlementFails.length)} of ${settlementFails.length}`}
+              </Typography>
+              <Box>
+                <IconButton 
+                  onClick={handlePreviousPage} 
+                  disabled={page === 0}
+                  size="small"
+                >
+                  <NavigateBeforeIcon />
+                </IconButton>
+                <IconButton 
+                  onClick={handleNextPage}
+                  disabled={page >= totalPages - 1}
+                  size="small"
+                >
+                  <NavigateNextIcon />
+                </IconButton>
+              </Box>
+            </Box>
           </Box>
 
           {/* Desktop View */}
