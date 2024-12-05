@@ -407,8 +407,20 @@ function Dashboard() {
   }
 
   return (
-    <Box sx={{ flexGrow: 1 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
+    <Box 
+      sx={{ 
+        display: 'flex',
+        flexDirection: 'column',
+        width: '100%',
+        gap: 3,
+      }}
+    >
+      {/* Alert Settings button container */}
+      <Box sx={{ 
+        display: 'flex', 
+        justifyContent: 'flex-end', 
+        width: '100%',
+      }}>
         <Button
           startIcon={<Settings />}
           onClick={() => navigate('/settings/alerts')}
@@ -417,14 +429,18 @@ function Dashboard() {
           Alert Settings
         </Button>
       </Box>
+
       <DragDropContext onDragEnd={handleDragEnd}>
         {/* First Row */}
         <Droppable droppableId="first-row" direction="horizontal">
           {(provided) => (
             <Grid 
               container 
-              spacing={2} 
-              sx={{ mb: 2 }}
+              spacing={3}
+              sx={{ 
+                width: '100%',
+                m: 0,
+              }}
               {...provided.droppableProps}
               ref={provided.innerRef}
             >
@@ -442,9 +458,7 @@ function Dashboard() {
                       <Box 
                         {...provided.dragHandleProps}
                         sx={{
-                          transition: 'transform 0.2s',
-                          transform: snapshot.isDragging ? 'scale(1.02)' : 'none',
-                          height: '100%'
+                          height: '100%',
                         }}
                       >
                         {cardComponents[cardId]}
@@ -463,7 +477,11 @@ function Dashboard() {
           {(provided) => (
             <Grid 
               container 
-              spacing={2}
+              spacing={3}
+              sx={{ 
+                width: '100%',
+                m: 0,
+              }}
               {...provided.droppableProps}
               ref={provided.innerRef}
             >
@@ -481,9 +499,7 @@ function Dashboard() {
                       <Box 
                         {...provided.dragHandleProps}
                         sx={{
-                          transition: 'transform 0.2s',
-                          transform: snapshot.isDragging ? 'scale(1.02)' : 'none',
-                          height: '100%'
+                          height: '100%',
                         }}
                       >
                         {cardComponents[cardId]}
@@ -498,15 +514,17 @@ function Dashboard() {
         </Droppable>
       </DragDropContext>
 
-      {/* Counterparty Exposure Chart */}
-      <Grid container spacing={2} sx={{ mt: 0 }}>
+      {/* Chart container */}
+      <Grid container spacing={3} sx={{ 
+        width: '100%',
+        m: 0,
+      }}>
         <Grid item xs={12}>
           <Paper sx={{ 
             p: { xs: 2, sm: 3 }, 
             height: { xs: 400, sm: 500 },
             display: 'flex',
             flexDirection: 'column',
-            mb: 3
           }}>
             <Typography variant="h6" color="text.secondary" gutterBottom>
               Counterparty Exposure
@@ -569,8 +587,11 @@ function Dashboard() {
         </Grid>
       </Grid>
 
-      {/* Trades Table */}
-      <Grid container spacing={2} sx={{ mt: 0 }}>
+      {/* Trades Table container */}
+      <Grid container spacing={3} sx={{ 
+        width: '100%',
+        m: 0,
+      }}>
         <Grid item xs={12}>
           <TradesTable 
             trades={trades} 

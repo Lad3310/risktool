@@ -27,8 +27,11 @@ function MetricCard({ title, value, subtitle, loading, onClick, type }) {
     <Paper 
       sx={{ 
         p: 3, 
+        height: '100%',
         cursor: onClick ? 'pointer' : 'default',
         position: 'relative',
+        display: 'flex',
+        flexDirection: 'column',
         '&:hover': {
           ...onClick ? {
             backgroundColor: type === 'buy' 
