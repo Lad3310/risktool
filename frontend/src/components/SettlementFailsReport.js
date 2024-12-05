@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   Paper, 
   Table, 
@@ -14,14 +14,24 @@ import {
   CircularProgress,
   Alert,
   Stack,
-  Card
+  Card,
+  Select,
+  MenuItem,
+  IconButton,
+  TextField,
+  InputAdornment
 } from '@mui/material';
 import { useSettlementFails } from '../hooks/useSettlementFails';
+import ExportButtons from './ExportButtons';
+import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
+import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 
 function SettlementFailsReport() {
   const { settlementFails, loading, error } = useSettlementFails();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const formatCurrency = (value) => {
     return value ? `$${value.toLocaleString('en-US', {
@@ -36,6 +46,25 @@ function SettlementFailsReport() {
       month: 'short',
       day: 'numeric'
     });
+  };
+
+  // Calculate pagination
+  const startIndex = page * rowsPerPage;
+  const endIndex = startIndex + rowsPerPage;
+  const paginatedFails = settlementFails.slice(startIndex, endIndex);
+  const totalPages = Math.ceil(settlementFails.length / rowsPerPage);
+
+  const handlePreviousPage = () => {
+    setPage(prev => Math.max(0, prev - 1));
+  };
+
+  const handleNextPage = () => {
+    setPage(prev => Math.min(totalPages - 1, prev + 1));
+  };
+
+  const handleRowsPerPageChange = (event) => {
+    setRowsPerPage(parseInt(event.target.value));
+    setPage(0);
   };
 
   const renderMobileCard = (fail) => (
@@ -114,17 +143,29 @@ function SettlementFailsReport() {
 
   return (
     <Box sx={{ p: { xs: 0.5, sm: 3 } }}>
-      <Typography 
-        variant="h5" 
-        sx={{ 
-          mb: { xs: 2, sm: 3 },
-          fontSize: { xs: '1.125rem', sm: '1.5rem' },
-          fontWeight: 500,
-          px: { xs: 1, sm: 0 }
-        }}
-      >
-        Settlement Fail Analysis
-      </Typography>
+      <Box sx={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center',
+        mb: 3,
+        flexWrap: 'wrap',
+        gap: 2
+      }}>
+        <Typography 
+          variant="h5" 
+          sx={{ 
+            fontSize: { xs: '1.125rem', sm: '1.5rem' },
+            fontWeight: 500,
+          }}
+        >
+          Settlement Fail Analysis
+        </Typography>
+
+        <ExportButtons 
+          data={settlementFails}
+          filename="settlement-fails"
+        />
+      </Box>
       
       {settlementFails.length === 0 ? (
         <Alert severity="info" sx={{ mx: { xs: 1, sm: 0 } }}>
@@ -134,7 +175,7 @@ function SettlementFailsReport() {
         <>
           {/* Mobile View */}
           <Box sx={{ display: { xs: 'block', md: 'none' }, px: 1 }}>
-            {settlementFails.map(renderMobileCard)}
+            {paginatedFails.map(renderMobileCard)}
           </Box>
 
           {/* Desktop View */}
@@ -144,53 +185,10 @@ function SettlementFailsReport() {
               sx={{ 
                 boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.05)',
                 borderRadius: 1,
-                overflow: 'auto',
-                maxWidth: '100%',
-                '&::-webkit-scrollbar': {
-                  height: '6px'
-                },
-                '&::-webkit-scrollbar-thumb': {
-                  backgroundColor: '#cbd5e1',
-                  borderRadius: '3px'
-                }
+                overflow: 'hidden',
               }}
             >
-              <Table 
-                sx={{
-                  minWidth: 650,
-                  '& .MuiTableCell-root': {
-                    borderBottom: '1px solid #e2e8f0',
-                    px: 3,
-                    py: 2,
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis'
-                  },
-                  '& .MuiTableHead-root': {
-                    backgroundColor: '#fff',
-                    '& .MuiTableCell-root': {
-                      borderBottom: '1px solid #e2e8f0',
-                      color: '#475569',
-                      fontWeight: 600,
-                      fontSize: '0.875rem'
-                    }
-                  },
-                  '& .MuiTableBody-root': {
-                    '& .MuiTableRow-root': {
-                      '&:hover': {
-                        backgroundColor: '#f8fafc',
-                      },
-                      '& .MuiTableCell-root': {
-                        fontSize: '0.875rem',
-                        color: '#1e293b',
-                        '&[align="right"]': {
-                          color: '#475569',
-                        }
-                      }
-                    }
-                  }
-                }}
-              >
+              <Table sx={{ minWidth: 650 }}>
                 <TableHead>
                   <TableRow>
                     <TableCell>Counterparty</TableCell>
@@ -201,13 +199,8 @@ function SettlementFailsReport() {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {settlementFails.map(fail => (
-                    <TableRow 
-                      key={fail.id}
-                      sx={{
-                        transition: 'background-color 0.2s ease',
-                      }}
-                    >
+                  {paginatedFails.map(fail => (
+                    <TableRow key={fail.id}>
                       <TableCell>{fail.counterparty_name}</TableCell>
                       <TableCell>{formatDate(fail.settlement_date)}</TableCell>
                       <TableCell>{fail.fail_days}</TableCell>
@@ -222,6 +215,50 @@ function SettlementFailsReport() {
                 </TableBody>
               </Table>
             </TableContainer>
+
+            {/* Pagination Controls */}
+            <Box sx={{ 
+              display: 'flex', 
+              justifyContent: 'flex-end',
+              alignItems: 'center',
+              mt: 2,
+              gap: 2
+            }}>
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <Typography variant="body2" color="text.secondary" sx={{ mr: 2 }}>
+                  Rows per page:
+                </Typography>
+                <Select
+                  value={rowsPerPage}
+                  onChange={handleRowsPerPageChange}
+                  size="small"
+                  sx={{ mr: 2 }}
+                >
+                  <MenuItem value={10}>10</MenuItem>
+                  <MenuItem value={25}>25</MenuItem>
+                  <MenuItem value={50}>50</MenuItem>
+                </Select>
+                <Typography variant="body2" color="text.secondary" sx={{ mr: 2 }}>
+                  {`${startIndex + 1}–${Math.min(endIndex, settlementFails.length)} of ${settlementFails.length}`}
+                </Typography>
+              </Box>
+              <Box>
+                <IconButton 
+                  onClick={handlePreviousPage} 
+                  disabled={page === 0}
+                  size="small"
+                >
+                  <NavigateBeforeIcon />
+                </IconButton>
+                <IconButton 
+                  onClick={handleNextPage}
+                  disabled={page >= totalPages - 1}
+                  size="small"
+                >
+                  <NavigateNextIcon />
+                </IconButton>
+              </Box>
+            </Box>
           </Box>
         </>
       )}

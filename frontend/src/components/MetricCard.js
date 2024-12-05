@@ -7,19 +7,11 @@ function MetricCard({ title, value, subtitle, loading, onClick, type }) {
   const getValueColor = () => {
     switch (type) {
       case 'buy':
-        return '#3b82f6'; // More vibrant blue (Tailwind blue-500)
-        // Alternative modern blues:
-        // '#0ea5e9' - Sky blue
-        // '#6366f1' - Indigo
-        // '#818cf8' - Modern blue with purple tint
+        return '#3b82f6';
       case 'sell':
-        return '#ef4444'; // More vibrant red (Tailwind red-500)
-        // Alternative modern reds:
-        // '#f43f5e' - Modern pink-red
-        // '#e11d48' - Rose red
-        // '#f87171' - Lighter vibrant red
+        return '#ef4444';
       default:
-        return 'text.primary'; // Default color
+        return 'text.primary';
     }
   };
 
@@ -27,9 +19,9 @@ function MetricCard({ title, value, subtitle, loading, onClick, type }) {
     <Paper 
       sx={{ 
         p: 3, 
-        height: '100%',
         cursor: onClick ? 'pointer' : 'default',
         position: 'relative',
+        height: '100%',
         display: 'flex',
         flexDirection: 'column',
         '&:hover': {
@@ -67,32 +59,43 @@ function MetricCard({ title, value, subtitle, loading, onClick, type }) {
       >
         <DragIndicatorIcon />
       </Box>
-      <Typography 
-        variant="h6" 
-        color={type ? getValueColor() : 'text.secondary'} 
-        gutterBottom
-        sx={{ 
-          fontWeight: 600,
-          letterSpacing: '0.5px'
-        }}
-      >
-        {title}
-      </Typography>
-      <Typography 
-        variant="h4" 
-        component="div" 
-        gutterBottom
-        sx={{ 
-          color: getValueColor(),
-          fontWeight: type ? 700 : 'inherit',
-          letterSpacing: '-0.5px'
-        }}
-      >
-        {value}
-      </Typography>
-      <Typography variant="body2" color="text.secondary">
-        {subtitle}
-      </Typography>
+      
+      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+        <Typography 
+          variant="h6" 
+          color={type ? getValueColor() : 'text.secondary'} 
+          gutterBottom
+          sx={{ 
+            fontWeight: 600,
+            letterSpacing: '0.5px'
+          }}
+        >
+          {title}
+        </Typography>
+        
+        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+          {typeof value === 'string' || typeof value === 'number' ? (
+            <Typography 
+              variant="h4" 
+              component="div" 
+              gutterBottom
+              sx={{ 
+                color: getValueColor(),
+                fontWeight: type ? 700 : 'inherit',
+                letterSpacing: '-0.5px'
+              }}
+            >
+              {value}
+            </Typography>
+          ) : (
+            value
+          )}
+        </Box>
+        
+        <Typography variant="body2" color="text.secondary" sx={{ mt: 'auto' }}>
+          {subtitle}
+        </Typography>
+      </Box>
     </Paper>
   );
 }

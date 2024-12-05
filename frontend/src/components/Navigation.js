@@ -26,7 +26,7 @@ import { LogoutOutlined } from '@mui/icons-material';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import { supabase } from '../lib/supabaseClient';
 
-const drawerWidth = 180;
+const drawerWidth = 240;
 
 export default function Navigation({ mobileOpen, setMobileOpen }) {
   const navigate = useNavigate();
@@ -198,7 +198,6 @@ export default function Navigation({ mobileOpen, setMobileOpen }) {
             backgroundColor: '#fff',
             '& .MuiListItemButton-root': {
               transition: 'all 0.15s ease',
-              py: 0.75,
             }
           }
         }}

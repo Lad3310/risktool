@@ -35,12 +35,7 @@ function Navbar({ mobileOpen, setMobileOpen }) {
       position="fixed" 
       sx={{ 
         zIndex: (theme) => theme.zIndex.drawer + 1,
-        backgroundColor: '#4ade80',
-        width: '100%',
-        '& .MuiToolbar-root': {
-          minHeight: { xs: '56px', sm: '64px' },
-          px: { xs: 1, sm: 1.5 }
-        }
+        backgroundColor: '#4ade80'
       }}
     >
       <Toolbar 

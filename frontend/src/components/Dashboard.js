@@ -37,11 +37,22 @@ function Dashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
 
+  const formatLargeNumber = (value) => {
+    if (!value) return '$0';
+    const isWholeNumber = value % 1 === 0;
+    return `$${value.toLocaleString('en-US', {
+      minimumFractionDigits: isWholeNumber ? 0 : 2,
+      maximumFractionDigits: isWholeNumber ? 0 : 2
+    })}`;
+  };
+
   const formatCurrency = (value) => {
-    return value ? `$${value.toLocaleString('en-US', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    })}` : '$0.00';
+    if (!value) return '$0';
+    const isWholeNumber = value % 1 === 0;
+    return `$${value.toLocaleString('en-US', {
+      minimumFractionDigits: isWholeNumber ? 0 : 2,
+      maximumFractionDigits: isWholeNumber ? 0 : 2
+    })}`;
   };
 
   const metrics = useMemo(() => {
@@ -172,7 +183,17 @@ function Dashboard() {
     largestExposure: (
       <MetricCard 
         title="Largest Exposure"
-        value={formatCurrency(metrics.largestExposure)}
+        value={
+          <Typography 
+            variant="h4" 
+            sx={{ 
+              wordBreak: 'break-word',
+              fontSize: { xs: '1.5rem', sm: '2rem' }
+            }}
+          >
+            {formatLargeNumber(metrics.largestExposure)}
+          </Typography>
+        }
         subtitle="Largest counterparty exposure"
         loading={loading}
       />
@@ -183,10 +204,10 @@ function Dashboard() {
         value={
           <Box sx={{ 
             display: 'flex', 
-            flexDirection: 'column', 
-            gap: 1,
-            fontSize: '0.875rem',
-            minHeight: '250px'
+            flexDirection: 'column',
+            height: '100%',
+            minHeight: '250px',
+            gap: 2,
           }}>
             {topFails.map((fail, index) => (
               <Box 
@@ -194,7 +215,7 @@ function Dashboard() {
                 sx={{ 
                   display: 'flex', 
                   flexDirection: 'column',
-                  p: 1,
+                  p: 2,
                   borderRadius: 1,
                   bgcolor: 'rgba(74, 222, 128, 0.08)',
                   '&:hover': {
@@ -210,7 +231,7 @@ function Dashboard() {
                     {fail.date}
                   </Typography>
                 </Box>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 0.5 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
                   <Typography variant="body2" fontWeight="medium">
                     {fail.counterparty}
                   </Typography>
@@ -220,14 +241,69 @@ function Dashboard() {
                 </Box>
               </Box>
             ))}
-            {topFails.length === 0 && (
-              <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center' }}>
-                No failed trades
-              </Typography>
-            )}
           </Box>
         }
         subtitle="Largest failed trades by value"
+      />
+    ),
+    largestCounterpartyExposure: (
+      <MetricCard
+        title="Counterparty Exposure"
+        value={
+          <Box sx={{ 
+            display: 'flex', 
+            flexDirection: 'column',
+            height: '100%',
+            minHeight: '250px',
+          }}>
+            <Typography 
+              variant="h4" 
+              sx={{ 
+                mb: 2,
+                wordBreak: 'break-word',
+                fontSize: { xs: '1.5rem', sm: '2rem' }
+              }}
+            >
+              {formatLargeNumber(largestCounterpartyExposure.amount)}
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+              Counterparty: {largestCounterpartyExposure.name}
+            </Typography>
+            <Box sx={{ flex: 1 }}>
+              {Object.entries(largestCounterpartyExposure.locationCounts).map(([location, count]) => {
+                let bgColor = 'rgba(74, 222, 128, 0.08)';
+                if (location === 'Fed') {
+                  bgColor = 'rgba(239, 68, 68, 0.08)';
+                } else if (location === 'DTC') {
+                  bgColor = 'rgba(59, 130, 246, 0.08)';
+                }
+                
+                return count > 0 ? (
+                  <Box 
+                    key={location}
+                    sx={{ 
+                      display: 'flex', 
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      p: 1,
+                      borderRadius: 1,
+                      bgcolor: bgColor,
+                      mb: 1
+                    }}
+                  >
+                    <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                      {location}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {count} unsettled trades
+                    </Typography>
+                  </Box>
+                ) : null;
+              })}
+            </Box>
+          </Box>
+        }
+        subtitle="Largest counterparty exposure by value"
       />
     ),
     settlementLocation: (
@@ -236,10 +312,9 @@ function Dashboard() {
         value={
           <Box sx={{ 
             display: 'flex', 
-            flexDirection: 'column', 
-            gap: 1,
-            fontSize: '0.875rem',
-            minHeight: '250px'
+            flexDirection: 'column',
+            height: '100%',
+            minHeight: '250px',
           }}>
             {unsettledByLocation.slice(0, 3).map((item, index) => {
               let bgColor = 'rgba(74, 222, 128, 0.08)';
@@ -260,9 +335,10 @@ function Dashboard() {
                     display: 'flex', 
                     justifyContent: 'space-between',
                     alignItems: 'center',
-                    p: 1,
+                    p: 2,
                     borderRadius: 1,
                     bgcolor: bgColor,
+                    mb: 2,
                     '&:hover': {
                       bgcolor: hoverBgColor
                     }
@@ -282,64 +358,9 @@ function Dashboard() {
                 </Box>
               );
             })}
-            {unsettledByLocation.length === 0 && (
-              <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center' }}>
-                No unsettled trades
-              </Typography>
-            )}
           </Box>
         }
         subtitle="Top 3 settlement locations by unsettled value"
-      />
-    ),
-    largestCounterpartyExposure: (
-      <MetricCard
-        title="Largest Counterparty Exposure"
-        value={
-          <Box sx={{ 
-            display: 'flex', 
-            flexDirection: 'column', 
-            gap: 1,
-            minHeight: '250px'
-          }}>
-            <Typography variant="h4" sx={{ mb: 1 }}>
-              {formatCurrency(largestCounterpartyExposure.amount)}
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-              Counterparty: {largestCounterpartyExposure.name}
-            </Typography>
-            {Object.entries(largestCounterpartyExposure.locationCounts).map(([location, count]) => {
-              let bgColor = 'rgba(74, 222, 128, 0.08)';
-              if (location === 'Fed') {
-                bgColor = 'rgba(239, 68, 68, 0.08)';
-              } else if (location === 'DTC') {
-                bgColor = 'rgba(59, 130, 246, 0.08)';
-              }
-              
-              return count > 0 ? (
-                <Box 
-                  key={location}
-                  sx={{ 
-                    display: 'flex', 
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    p: 1,
-                    borderRadius: 1,
-                    bgcolor: bgColor
-                  }}
-                >
-                  <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                    {location}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {count} unsettled trades
-                  </Typography>
-                </Box>
-              ) : null;
-            })}
-          </Box>
-        }
-        subtitle="Largest counterparty exposure by value"
       />
     ),
     settlementFailCosts: (
@@ -407,20 +428,8 @@ function Dashboard() {
   }
 
   return (
-    <Box 
-      sx={{ 
-        display: 'flex',
-        flexDirection: 'column',
-        width: '100%',
-        gap: 3,
-      }}
-    >
-      {/* Alert Settings button container */}
-      <Box sx={{ 
-        display: 'flex', 
-        justifyContent: 'flex-end', 
-        width: '100%',
-      }}>
+    <Box sx={{ flexGrow: 1 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
         <Button
           startIcon={<Settings />}
           onClick={() => navigate('/settings/alerts')}
@@ -429,17 +438,17 @@ function Dashboard() {
           Alert Settings
         </Button>
       </Box>
-
       <DragDropContext onDragEnd={handleDragEnd}>
         {/* First Row */}
         <Droppable droppableId="first-row" direction="horizontal">
           {(provided) => (
             <Grid 
               container 
-              spacing={3}
+              spacing={3} 
               sx={{ 
-                width: '100%',
-                m: 0,
+                mb: 3,
+                mx: { xs: -1, sm: -2 },
+                width: { xs: 'calc(100% + 16px)', sm: 'calc(100% + 32px)' },
               }}
               {...provided.droppableProps}
               ref={provided.innerRef}
@@ -458,7 +467,9 @@ function Dashboard() {
                       <Box 
                         {...provided.dragHandleProps}
                         sx={{
-                          height: '100%',
+                          transition: 'transform 0.2s',
+                          transform: snapshot.isDragging ? 'scale(1.02)' : 'none',
+                          height: '100%'
                         }}
                       >
                         {cardComponents[cardId]}
@@ -477,10 +488,10 @@ function Dashboard() {
           {(provided) => (
             <Grid 
               container 
-              spacing={3}
+              spacing={3} 
               sx={{ 
-                width: '100%',
-                m: 0,
+                mx: { xs: -1, sm: -2 },
+                width: { xs: 'calc(100% + 16px)', sm: 'calc(100% + 32px)' },
               }}
               {...provided.droppableProps}
               ref={provided.innerRef}
@@ -499,7 +510,9 @@ function Dashboard() {
                       <Box 
                         {...provided.dragHandleProps}
                         sx={{
-                          height: '100%',
+                          transition: 'transform 0.2s',
+                          transform: snapshot.isDragging ? 'scale(1.02)' : 'none',
+                          height: '100%'
                         }}
                       >
                         {cardComponents[cardId]}
@@ -514,17 +527,23 @@ function Dashboard() {
         </Droppable>
       </DragDropContext>
 
-      {/* Chart container */}
-      <Grid container spacing={3} sx={{ 
-        width: '100%',
-        m: 0,
-      }}>
+      {/* Counterparty Exposure Chart */}
+      <Grid 
+        container 
+        spacing={3} 
+        sx={{ 
+          mt: 0, 
+          mx: { xs: -1, sm: -2 },
+          width: { xs: 'calc(100% + 16px)', sm: 'calc(100% + 32px)' },
+        }}
+      >
         <Grid item xs={12}>
           <Paper sx={{ 
             p: { xs: 2, sm: 3 }, 
             height: { xs: 400, sm: 500 },
             display: 'flex',
             flexDirection: 'column',
+            mb: 3
           }}>
             <Typography variant="h6" color="text.secondary" gutterBottom>
               Counterparty Exposure
@@ -587,11 +606,16 @@ function Dashboard() {
         </Grid>
       </Grid>
 
-      {/* Trades Table container */}
-      <Grid container spacing={3} sx={{ 
-        width: '100%',
-        m: 0,
-      }}>
+      {/* Trades Table */}
+      <Grid 
+        container 
+        spacing={3} 
+        sx={{ 
+          mt: 0, 
+          mx: { xs: -1, sm: -2 },
+          width: { xs: 'calc(100% + 16px)', sm: 'calc(100% + 32px)' },
+        }}
+      >
         <Grid item xs={12}>
           <TradesTable 
             trades={trades} 
