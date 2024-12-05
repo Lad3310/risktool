@@ -14,7 +14,7 @@ import {
   ListItemText,
 } from '@mui/material';
 import { Check, Close } from '@mui/icons-material';
-import { supabase } from '../lib/supabaseClient';
+import { supabase } from '../utils/supabaseClient';
 import { useNavigate } from 'react-router-dom';
 
 const SignUp = () => {
@@ -48,11 +48,28 @@ const SignUp = () => {
 
     try {
       console.log('Starting signup process for:', email);
+      
+      // First check if user already exists
+      const { data: existingUser } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('email', email)
+        .single();
+
+      if (existingUser) {
+        setError('An account with this email already exists');
+        return;
+      }
+
+      // Attempt signup
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/dashboard`,
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          data: {
+            email: email,
+          }
         }
       });
 
@@ -69,6 +86,8 @@ const SignUp = () => {
           setError('An account with this email already exists. Please try logging in.');
         } else if (error.message.includes('rate limit')) {
           setError('Too many signup attempts. Please try again in a few minutes.');
+        } else if (error.message.includes('email')) {
+          setError('Error sending confirmation email. Please try again or contact support.');
         } else {
           setError(`Signup failed: ${error.message}`);
         }
@@ -80,6 +99,21 @@ const SignUp = () => {
         setSuccessMessage('Success! Please check your email for the confirmation link.');
         setEmail('');
         setPassword('');
+        
+        // Create profile record
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert([
+            {
+              id: data.user.id,
+              email: email,
+              created_at: new Date().toISOString(),
+            }
+          ]);
+
+        if (profileError) {
+          console.error('Error creating profile:', profileError);
+        }
       } else {
         console.warn('No user data in successful response:', data);
         setError('Something went wrong. Please try again.');

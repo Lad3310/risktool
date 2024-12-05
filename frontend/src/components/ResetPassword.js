@@ -8,7 +8,7 @@ import {
   Box,
   Alert,
 } from '@mui/material';
-import { supabase } from '../lib/supabaseClient';
+import { supabase } from '../utils/supabaseClient';
 import { useNavigate } from 'react-router-dom';
 
 const ResetPassword = () => {

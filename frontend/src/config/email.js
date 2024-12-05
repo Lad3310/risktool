@@ -1,7 +1,7 @@
 export const emailConfig = {
   sender: {
     name: 'Risk Monitoring',
-    email: 'notifications@yourdomain.com', // Replace with your verified Resend email
+    email: 'noreply@risktool-one.vercel',
   },
   templates: {
     confirmSignup: {

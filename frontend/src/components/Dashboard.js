@@ -188,7 +188,8 @@ function Dashboard() {
             variant="h4" 
             sx={{ 
               wordBreak: 'break-word',
-              fontSize: { xs: '1.5rem', sm: '2rem' }
+              fontSize: { xs: '1.2rem', sm: '1.5rem', md: '2rem' },
+              whiteSpace: 'normal',
             }}
           >
             {formatLargeNumber(metrics.largestExposure)}
@@ -413,11 +414,15 @@ function Dashboard() {
     try {
       const { data, error } = await supabase
         .from('trades')
-        .select('*')
-        // RLS will automatically filter based on auth.uid()
+        .select('*');
       
       if (error) throw error;
-      // Handle data
+      
+      // Use the data here
+      if (data) {
+        // Do something with the data
+        console.log('Trades fetched:', data.length);
+      }
     } catch (error) {
       console.error('Error fetching trades:', error.message);
     }
@@ -444,11 +449,12 @@ function Dashboard() {
           {(provided) => (
             <Grid 
               container 
-              spacing={3} 
+              spacing={2}
               sx={{ 
-                mb: 3,
-                mx: { xs: -1, sm: -2 },
-                width: { xs: 'calc(100% + 16px)', sm: 'calc(100% + 32px)' },
+                mb: { xs: 1, sm: 3 },
+                mx: { xs: 0, sm: -2 },
+                width: { xs: '100%', sm: 'calc(100% + 32px)' },
+                overflow: 'hidden',
               }}
               {...provided.droppableProps}
               ref={provided.innerRef}
@@ -488,10 +494,11 @@ function Dashboard() {
           {(provided) => (
             <Grid 
               container 
-              spacing={3} 
+              spacing={2}
               sx={{ 
-                mx: { xs: -1, sm: -2 },
-                width: { xs: 'calc(100% + 16px)', sm: 'calc(100% + 32px)' },
+                mx: { xs: 0, sm: -2 },
+                width: { xs: '100%', sm: 'calc(100% + 32px)' },
+                overflow: 'hidden',
               }}
               {...provided.droppableProps}
               ref={provided.innerRef}
@@ -530,20 +537,22 @@ function Dashboard() {
       {/* Counterparty Exposure Chart */}
       <Grid 
         container 
-        spacing={3} 
+        spacing={2}
         sx={{ 
           mt: 0, 
-          mx: { xs: -1, sm: -2 },
-          width: { xs: 'calc(100% + 16px)', sm: 'calc(100% + 32px)' },
+          mx: { xs: 0, sm: -2 },
+          width: { xs: '100%', sm: 'calc(100% + 32px)' },
+          overflow: 'hidden',
         }}
       >
         <Grid item xs={12}>
           <Paper sx={{ 
-            p: { xs: 2, sm: 3 }, 
-            height: { xs: 400, sm: 500 },
+            p: { xs: 1.5, sm: 3 }, 
+            height: { xs: 300, sm: 400, md: 500 },
             display: 'flex',
             flexDirection: 'column',
-            mb: 3
+            mb: { xs: 2, sm: 3 },
+            overflow: 'hidden',
           }}>
             <Typography variant="h6" color="text.secondary" gutterBottom>
               Counterparty Exposure
@@ -558,10 +567,10 @@ function Dashboard() {
                   <BarChart 
                     data={metrics.exposureData}
                     margin={{ 
-                      top: 20, 
-                      right: 20, 
-                      left: isMobile ? 40 : 60, 
-                      bottom: isMobile ? 80 : 20 
+                      top: 10, 
+                      right: isMobile ? 10 : 20, 
+                      left: isMobile ? 20 : 60, 
+                      bottom: isMobile ? 60 : 20 
                     }}
                   >
                     <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -609,11 +618,12 @@ function Dashboard() {
       {/* Trades Table */}
       <Grid 
         container 
-        spacing={3} 
+        spacing={2}
         sx={{ 
           mt: 0, 
-          mx: { xs: -1, sm: -2 },
-          width: { xs: 'calc(100% + 16px)', sm: 'calc(100% + 32px)' },
+          mx: { xs: 0, sm: -2 },
+          width: { xs: '100%', sm: 'calc(100% + 32px)' },
+          overflow: 'hidden',
         }}
       >
         <Grid item xs={12}>

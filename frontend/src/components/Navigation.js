@@ -1,36 +1,37 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
+  Box,
   Drawer,
+  IconButton,
   List,
   ListItem,
+  ListItemButton,
   ListItemIcon,
   ListItemText,
-  ListItemButton,
   Toolbar,
-  AppBar,
   Typography,
-  IconButton,
-  Box,
-  Button,
-  Breadcrumbs
+  useTheme,
+  AppBar,
 } from '@mui/material';
+
+// Import icons
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
-import AssessmentIcon from '@mui/icons-material/Assessment';
 import DashboardIcon from '@mui/icons-material/Dashboard';
+import AssessmentIcon from '@mui/icons-material/Assessment';
 import AnalyticsIcon from '@mui/icons-material/Analytics';
 import ContactSupportIcon from '@mui/icons-material/ContactSupport';
 import MoneyOffOutlinedIcon from '@mui/icons-material/MoneyOffOutlined';
 import { LogoutOutlined } from '@mui/icons-material';
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
-import { supabase } from '../lib/supabaseClient';
+import { supabase } from '../utils/supabaseClient';
 
 const drawerWidth = 240;
 
 export default function Navigation({ mobileOpen, setMobileOpen }) {
   const navigate = useNavigate();
   const location = useLocation();
+  const theme = useTheme();
 
   const handleLogout = async () => {
     await supabase.auth.signOut();

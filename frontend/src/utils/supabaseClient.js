@@ -11,9 +11,15 @@ if (!supabaseUrl || !supabaseKey) {
   throw new Error('Missing Supabase environment variables');
 }
 
-export const supabase = createClient(supabaseUrl, supabaseKey);
+export const supabase = createClient(supabaseUrl, supabaseKey, {
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true
+  }
+});
 
-// Add this to test the connection
+// Connection test
 supabase.from('performance_metrics').select('count').single()
   .then(({ error }) => {
     if (error) {
@@ -21,4 +27,12 @@ supabase.from('performance_metrics').select('count').single()
     } else {
       console.log('Supabase connection successful');
     }
-  }); 
+  });
+
+// Add auth state change listener
+supabase.auth.onAuthStateChange((event, session) => {
+  console.log('Auth event:', event);
+  if (event === 'SIGNED_IN') {
+    console.log('User signed in:', session?.user?.email);
+  }
+}); 

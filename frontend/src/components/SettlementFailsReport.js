@@ -71,24 +71,37 @@ function SettlementFailsReport() {
     <Card 
       key={fail.id}
       sx={{
-        p: 3,
+        p: { xs: 2, sm: 3 },
         mb: 2,
         boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.05)',
-        '&:last-child': { mb: 0 }
+        '&:last-child': { mb: 0 },
+        mx: { xs: 1, sm: 0 },
       }}
     >
-      <Stack spacing={2}>
+      <Stack spacing={1.5}>
         <Box sx={{ 
           display: 'flex', 
           justifyContent: 'space-between', 
-          alignItems: 'center',
+          alignItems: 'flex-start',
           borderBottom: '1px solid rgba(0, 0, 0, 0.08)',
-          pb: 1
+          pb: 1,
+          flexWrap: 'wrap',
         }}>
-          <Typography variant="subtitle1" color="text.secondary">
+          <Typography 
+            variant="subtitle2" 
+            color="text.secondary"
+            sx={{ minWidth: '80px' }}
+          >
             Counterparty
           </Typography>
-          <Typography variant="subtitle1" sx={{ fontWeight: 500 }}>
+          <Typography 
+            variant="subtitle2" 
+            sx={{ 
+              fontWeight: 500,
+              maxWidth: '60%',
+              wordBreak: 'break-word'
+            }}
+          >
             {fail.counterparty_name}
           </Typography>
         </Box>
@@ -96,14 +109,26 @@ function SettlementFailsReport() {
         <Box sx={{ 
           display: 'flex', 
           justifyContent: 'space-between', 
-          alignItems: 'center',
+          alignItems: 'flex-start',
           borderBottom: '1px solid rgba(0, 0, 0, 0.08)',
-          pb: 1
+          pb: 1,
+          flexWrap: 'wrap',
         }}>
-          <Typography variant="subtitle1" color="text.secondary">
+          <Typography 
+            variant="subtitle2" 
+            color="text.secondary"
+            sx={{ minWidth: '80px' }}
+          >
             Date
           </Typography>
-          <Typography variant="subtitle1" sx={{ fontWeight: 500 }}>
+          <Typography 
+            variant="subtitle2" 
+            sx={{ 
+              fontWeight: 500,
+              maxWidth: '60%',
+              wordBreak: 'break-word'
+            }}
+          >
             {formatDate(fail.settlement_date)}
           </Typography>
         </Box>
@@ -111,14 +136,26 @@ function SettlementFailsReport() {
         <Box sx={{ 
           display: 'flex', 
           justifyContent: 'space-between', 
-          alignItems: 'center',
+          alignItems: 'flex-start',
           borderBottom: '1px solid rgba(0, 0, 0, 0.08)',
-          pb: 1
+          pb: 1,
+          flexWrap: 'wrap',
         }}>
-          <Typography variant="subtitle1" color="text.secondary">
+          <Typography 
+            variant="subtitle2" 
+            color="text.secondary"
+            sx={{ minWidth: '80px' }}
+          >
             Days
           </Typography>
-          <Typography variant="subtitle1" sx={{ fontWeight: 500 }}>
+          <Typography 
+            variant="subtitle2" 
+            sx={{ 
+              fontWeight: 500,
+              maxWidth: '60%',
+              wordBreak: 'break-word'
+            }}
+          >
             {fail.fail_days}
           </Typography>
         </Box>
@@ -126,14 +163,26 @@ function SettlementFailsReport() {
         <Box sx={{ 
           display: 'flex', 
           justifyContent: 'space-between', 
-          alignItems: 'center',
+          alignItems: 'flex-start',
           borderBottom: '1px solid rgba(0, 0, 0, 0.08)',
-          pb: 1
+          pb: 1,
+          flexWrap: 'wrap',
         }}>
-          <Typography variant="subtitle1" color="text.secondary">
+          <Typography 
+            variant="subtitle2" 
+            color="text.secondary"
+            sx={{ minWidth: '80px' }}
+          >
             Value
           </Typography>
-          <Typography variant="subtitle1" sx={{ fontWeight: 500 }}>
+          <Typography 
+            variant="subtitle2" 
+            sx={{ 
+              fontWeight: 500,
+              maxWidth: '60%',
+              wordBreak: 'break-word'
+            }}
+          >
             {formatCurrency(Math.abs(fail.net_money))}
           </Typography>
         </Box>
@@ -141,13 +190,25 @@ function SettlementFailsReport() {
         <Box sx={{ 
           display: 'flex', 
           justifyContent: 'space-between', 
-          alignItems: 'center',
-          pb: 1
+          alignItems: 'flex-start',
+          pb: 1,
+          flexWrap: 'wrap',
         }}>
-          <Typography variant="subtitle1" color="text.secondary">
+          <Typography 
+            variant="subtitle2" 
+            color="text.secondary"
+            sx={{ minWidth: '80px' }}
+          >
             Cost
           </Typography>
-          <Typography variant="subtitle1" sx={{ fontWeight: 500 }}>
+          <Typography 
+            variant="subtitle2" 
+            sx={{ 
+              fontWeight: 500,
+              maxWidth: '60%',
+              wordBreak: 'break-word'
+            }}
+          >
             {formatCurrency(fail.fail_cost)}
           </Typography>
         </Box>
@@ -181,15 +242,19 @@ function SettlementFailsReport() {
   }
 
   return (
-    <Box sx={{ p: { xs: 0.5, sm: 3 } }}>
+    <Box sx={{ 
+      p: { xs: 1, sm: 3 },
+      maxWidth: '100%',
+      overflow: 'hidden',
+    }}>
       <Box sx={{ 
-        p: { xs: 2, sm: 3 },
+        p: { xs: 1, sm: 3 },
         display: 'flex', 
         flexDirection: { xs: 'column', sm: 'row' },
         justifyContent: 'space-between', 
         alignItems: { xs: 'flex-start', sm: 'center' },
-        mb: 3,
-        gap: 2
+        mb: { xs: 2, sm: 3 },
+        gap: { xs: 1, sm: 2 }
       }}>
         <Typography 
           variant="h5" 
@@ -228,7 +293,9 @@ function SettlementFailsReport() {
               justifyContent: 'space-between',
               alignItems: 'center',
               mt: 2,
-              px: 1
+              px: { xs: 2, sm: 1 },
+              flexWrap: 'wrap',
+              gap: 1
             }}>
               <Typography variant="body2" color="text.secondary">
                 {`${startIndex + 1}–${Math.min(endIndex, settlementFails.length)} of ${settlementFails.length}`}

@@ -11,7 +11,7 @@ import {
   Container
 } from '@mui/material';
 import { NotificationsActive, Email } from '@mui/icons-material';
-import { supabase } from '../lib/supabaseClient';
+import { supabase } from '../utils/supabaseClient';
 import { useAuth } from '../context/AuthContext';
 
 const AlertSettings = () => {
