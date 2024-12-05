@@ -5,6 +5,7 @@ export function useTrades() {
   const [trades, setTrades] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [topFailCosts, setTopFailCosts] = useState([]);
 
   useEffect(() => {
     const fetchTrades = async () => {
@@ -70,6 +71,43 @@ export function useTrades() {
 
         console.log('Validated trades count:', validatedTrades.length);
         setTrades(validatedTrades);
+
+        const fetchFailCosts = async () => {
+          const { data, error } = await supabase
+            .from('settlement_fails_view')
+            .select('id, counterparty_name, fail_days, net_money, fail_cost')
+            .eq('settlement_status', 'unsettled')
+            .order('fail_cost', { ascending: false });
+
+          if (error) throw error;
+
+          // Aggregate by counterparty
+          const counterpartyCosts = data.reduce((acc, trade) => {
+            if (!acc[trade.counterparty_name]) {
+              acc[trade.counterparty_name] = {
+                counterparty_name: trade.counterparty_name,
+                total_fail_cost: 0,
+                trade_count: 0,
+                fail_days: 0
+              };
+            }
+            acc[trade.counterparty_name].total_fail_cost += trade.fail_cost;
+            acc[trade.counterparty_name].trade_count += 1;
+            acc[trade.counterparty_name].fail_days = Math.max(
+              acc[trade.counterparty_name].fail_days, 
+              trade.fail_days
+            );
+            return acc;
+          }, {});
+
+          setTopFailCosts(
+            Object.values(counterpartyCosts)
+              .sort((a, b) => b.total_fail_cost - a.total_fail_cost)
+              .slice(0, 3)
+          );
+        };
+
+        fetchFailCosts();
       } catch (err) {
         console.error('Detailed error:', err);
         setError(err.message);
@@ -231,5 +269,6 @@ export function useTrades() {
     largestCounterpartyTradeCount: getCounterpartyTradeCount(trades),
     topFails: getTopFails(trades),
     unsettledByLocation: getUnsettledByLocation(trades),
+    topFailCosts: topFailCosts,
   };
 } 

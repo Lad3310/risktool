@@ -13,6 +13,12 @@ import { useAuth } from '../context/AuthContext';
 import { Settings } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient(
+  process.env.REACT_APP_SUPABASE_URL,
+  process.env.REACT_APP_SUPABASE_ANON_KEY
+)
 
 function Dashboard() {
   const { 
@@ -22,7 +28,8 @@ function Dashboard() {
     largestCounterpartyExposure, 
     largestCounterpartyTradeCount,
     topFails,
-    unsettledByLocation 
+    unsettledByLocation,
+    topFailCosts
   } = useTrades();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -334,7 +341,65 @@ function Dashboard() {
         }
         subtitle="Largest counterparty exposure by value"
       />
-    )
+    ),
+    settlementFailCosts: (
+      <MetricCard
+        title="Settlement Fail Costs"
+        value={
+          <Box sx={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            gap: 1,
+            minHeight: '250px'
+          }}>
+            {topFailCosts.map((item, index) => (
+              <Box 
+                key={index}
+                sx={{ 
+                  display: 'flex', 
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  p: 1,
+                  borderRadius: 1,
+                  bgcolor: 'rgba(239, 68, 68, 0.08)',
+                  '&:hover': {
+                    bgcolor: 'rgba(239, 68, 68, 0.12)'
+                  }
+                }}
+              >
+                <Box>
+                  <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                    {item.counterparty_name}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    {item.fail_days} days • {item.trade_count} trades
+                  </Typography>
+                </Box>
+                <Typography variant="body2" color="error" sx={{ fontWeight: 600 }}>
+                  {formatCurrency(item.total_fail_cost)}
+                </Typography>
+              </Box>
+            ))}
+          </Box>
+        }
+        subtitle="Top counterparties by settlement fail costs"
+        onClick={() => navigate('/reports/settlement-fails')}
+      />
+    ),
+  };
+
+  const fetchData = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('trades')
+        .select('*')
+        // RLS will automatically filter based on auth.uid()
+      
+      if (error) throw error;
+      // Handle data
+    } catch (error) {
+      console.error('Error fetching trades:', error.message);
+    }
   };
 
   if (error) {

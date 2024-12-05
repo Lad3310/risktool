@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, ButtonGroup } from '@mui/material';
+import { Button, ButtonGroup, Box } from '@mui/material';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import * as XLSX from 'xlsx';
 import { jsPDF } from 'jspdf';
@@ -198,23 +198,18 @@ function ExportButtons({ data, filename = 'report' }) {
   };
 
   return (
-    <ButtonGroup 
-      variant="contained" 
-      size="large"
-      sx={{ 
-        '& .MuiButton-root': {
-          px: 4,
-          py: 1.5,
-          fontSize: '1rem'
-        }
-      }}
-    >
+    <Box sx={{ display: 'flex', gap: 1, flexDirection: { xs: 'column', sm: 'row' } }}>
       <Button 
         onClick={exportToCSV}
         startIcon={<FileDownloadIcon />}
+        variant="contained"
+        fullWidth
+        size="large"
         sx={{ 
           backgroundColor: '#4ade80',
-          '&:hover': { backgroundColor: '#22c55e' }
+          '&:hover': { backgroundColor: '#22c55e' },
+          fontSize: { xs: '0.875rem', sm: '1rem' },
+          py: { xs: 1, sm: 1.5 }
         }}
       >
         CSV
@@ -222,9 +217,14 @@ function ExportButtons({ data, filename = 'report' }) {
       <Button 
         onClick={exportToXLSX}
         startIcon={<FileDownloadIcon />}
+        variant="contained"
+        fullWidth
+        size="large"
         sx={{ 
           backgroundColor: '#4ade80',
-          '&:hover': { backgroundColor: '#22c55e' }
+          '&:hover': { backgroundColor: '#22c55e' },
+          fontSize: { xs: '0.875rem', sm: '1rem' },
+          py: { xs: 1, sm: 1.5 }
         }}
       >
         XLSX
@@ -232,14 +232,19 @@ function ExportButtons({ data, filename = 'report' }) {
       <Button 
         onClick={exportToPDF}
         startIcon={<FileDownloadIcon />}
+        variant="contained"
+        fullWidth
+        size="large"
         sx={{ 
           backgroundColor: '#4ade80',
-          '&:hover': { backgroundColor: '#22c55e' }
+          '&:hover': { backgroundColor: '#22c55e' },
+          fontSize: { xs: '0.875rem', sm: '1rem' },
+          py: { xs: 1, sm: 1.5 }
         }}
       >
         PDF
       </Button>
-    </ButtonGroup>
+    </Box>
   );
 }
 
