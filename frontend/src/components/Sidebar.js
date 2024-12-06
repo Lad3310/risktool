@@ -44,7 +44,7 @@ function Sidebar({ mobileOpen, setMobileOpen }) {
               }
             }}
           >
-            <ListItemIcon sx={{ color: '#4ade80' }}>
+            <ListItemIcon sx={{ color: '#3b82f6' }}>
               {item.icon}
             </ListItemIcon>
             <ListItemText 

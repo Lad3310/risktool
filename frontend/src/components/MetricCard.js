@@ -24,15 +24,15 @@ function MetricCard({ title, value, subtitle, loading, onClick, type }) {
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
+        boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.05) !important',
+        borderRadius: 1,
         '&:hover': {
-          ...onClick ? {
-            backgroundColor: type === 'buy' 
-              ? 'rgba(59, 130, 246, 0.08)'
-              : type === 'sell' 
-              ? 'rgba(239, 68, 68, 0.08)'
-              : 'rgba(74, 222, 128, 0.08)',
-            transform: 'translateY(-2px)',
-          } : {},
+          backgroundColor: type === 'buy' 
+            ? 'rgba(59, 130, 246, 0.08)'
+            : type === 'sell' 
+            ? 'rgba(239, 68, 68, 0.08)'
+            : 'rgba(59, 130, 246, 0.08)',
+          transform: 'translateY(-2px)',
           '& .drag-handle': {
             opacity: 1
           }
@@ -40,7 +40,7 @@ function MetricCard({ title, value, subtitle, loading, onClick, type }) {
         transition: 'all 0.2s ease-in-out'
       }}
       onClick={onClick}
-      elevation={1}
+      elevation={0}
     >
       <Box 
         className="drag-handle"
@@ -53,8 +53,9 @@ function MetricCard({ title, value, subtitle, loading, onClick, type }) {
           cursor: 'grab',
           color: 'text.secondary',
           '&:hover': {
-            color: 'primary.main'
-          }
+            color: '#3b82f6'
+          },
+          zIndex: 1
         }}
       >
         <DragIndicatorIcon />

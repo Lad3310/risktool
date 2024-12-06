@@ -1,5 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
+import {
+  Box,
+  Paper,
+  Typography,
+  TextField,
+  Button,
+  Alert,
+  InputAdornment
+} from '@mui/material';
+import { NotificationsActive } from '@mui/icons-material';
 
 const AlertPreferences = ({ userId }) => {
   const [email, setEmail] = useState('');
@@ -13,6 +23,16 @@ const AlertPreferences = ({ userId }) => {
   useEffect(() => {
     fetchAlertPreferences();
   }, [userId]);
+
+  useEffect(() => {
+    if (message) {
+      const timer = setTimeout(() => {
+        setMessage('');
+      }, 3000); // Message will disappear after 3 seconds
+
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
 
   const fetchAlertPreferences = async () => {
     try {
@@ -58,68 +78,109 @@ const AlertPreferences = ({ userId }) => {
     }
   };
 
+  const handleTestAlert = async () => {
+    try {
+      const response = await fetch('/api/test-alert', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email,
+          trade_value: 1500000,
+          trade_count: 12
+        })
+      });
+      
+      const data = await response.json();
+      if (data.status === 'success') {
+        setMessage('Test alert sent! Check your email.');
+      } else {
+        setMessage('Error sending test alert: ' + data.message);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      setMessage('Failed to send test alert');
+    }
+  };
+
   return (
-    <div className="p-4 bg-white rounded-lg shadow">
-      <h2 className="text-xl font-bold mb-4">Alert Preferences</h2>
-      <form onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <label className="block mb-2">Email Address</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full p-2 border rounded"
-            required
-          />
-        </div>
+    <Paper sx={{ p: 3, maxWidth: 600, mx: 'auto' }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+        <NotificationsActive sx={{ color: 'primary.main', mr: 1 }} />
+        <Typography variant="h5" component="h2">
+          Alert Preferences
+        </Typography>
+      </Box>
 
-        <div className="mb-4">
-          <label className="block mb-2">
-            Unsettled Trade Value Threshold
-          </label>
-          <input
-            type="number"
-            value={alerts.unsettledTradeThreshold}
-            onChange={(e) => setAlerts({
-              ...alerts,
-              unsettledTradeThreshold: parseInt(e.target.value)
-            })}
-            className="w-full p-2 border rounded"
-            min="0"
-          />
-        </div>
+      <Box component="form" onSubmit={handleSubmit}>
+        <TextField
+          fullWidth
+          label="Email Address"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          sx={{ mb: 3 }}
+        />
 
-        <div className="mb-4">
-          <label className="block mb-2">
-            Counterparty Trade Count Threshold
-          </label>
-          <input
-            type="number"
-            value={alerts.counterpartyTradeThreshold}
-            onChange={(e) => setAlerts({
-              ...alerts,
-              counterpartyTradeThreshold: parseInt(e.target.value)
-            })}
-            className="w-full p-2 border rounded"
-            min="0"
-          />
-        </div>
+        <TextField
+          fullWidth
+          label="Unsettled Trade Value Threshold"
+          type="number"
+          value={alerts.unsettledTradeThreshold}
+          onChange={(e) => setAlerts({
+            ...alerts,
+            unsettledTradeThreshold: parseInt(e.target.value)
+          })}
+          InputProps={{
+            startAdornment: <InputAdornment position="start">$</InputAdornment>,
+          }}
+          sx={{ mb: 3 }}
+        />
 
-        <button
+        <TextField
+          fullWidth
+          label="Counterparty Trade Count Threshold"
+          type="number"
+          value={alerts.counterpartyTradeThreshold}
+          onChange={(e) => setAlerts({
+            ...alerts,
+            counterpartyTradeThreshold: parseInt(e.target.value)
+          })}
+          sx={{ mb: 3 }}
+        />
+
+        <Button
+          fullWidth
+          variant="contained"
           type="submit"
           disabled={loading}
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          sx={{ mb: 2 }}
         >
           {loading ? 'Saving...' : 'Save Preferences'}
-        </button>
+        </Button>
+
+        <Button
+          fullWidth
+          variant="contained"
+          onClick={handleTestAlert}
+          sx={{ mb: 2 }}
+        >
+          Send Test Alert
+        </Button>
 
         {message && (
-          <div className="mt-4 text-sm text-gray-600">
+          <Alert 
+            severity="success" 
+            sx={{ mt: 2 }}
+            onClose={() => setMessage('')}
+          >
             {message}
-          </div>
+          </Alert>
         )}
-      </form>
-    </div>
+      </Box>
+    </Paper>
   );
 };
 

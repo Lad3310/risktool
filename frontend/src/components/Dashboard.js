@@ -434,7 +434,12 @@ function Dashboard() {
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
+      <Box sx={{ 
+        display: 'flex', 
+        justifyContent: 'flex-end', 
+        mb: 2,
+        px: { xs: 1.5, sm: 3 }
+      }}>
         <Button
           startIcon={<Settings />}
           onClick={() => navigate('/settings/alerts')}
@@ -444,17 +449,22 @@ function Dashboard() {
         </Button>
       </Box>
       <DragDropContext onDragEnd={handleDragEnd}>
-        {/* First Row */}
-        <Droppable droppableId="first-row" direction="horizontal">
+        <Droppable droppableId="first-row">
           {(provided) => (
             <Grid 
               container 
-              spacing={1}
+              spacing={2}
               sx={{ 
-                mb: { xs: 1, sm: 2 },
+                mb: { xs: 3, sm: 4 },
                 mx: 0,
                 width: '100%',
                 overflow: 'hidden',
+                alignItems: 'stretch',
+                px: { xs: 1.5, sm: 3 },
+                '& .MuiPaper-root': {  // Ensure consistent shadow on all sides
+                  boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.05)',
+                  borderRadius: 1
+                }
               }}
               {...provided.droppableProps}
               ref={provided.innerRef}
@@ -473,14 +483,12 @@ function Dashboard() {
                       <Box 
                         {...provided.dragHandleProps}
                         sx={{
+                          height: '100%',
                           transition: 'transform 0.2s',
                           transform: snapshot.isDragging ? 'scale(1.02)' : 'none',
-                          height: '100%'
                         }}
                       >
-                        <Box sx={{ p: { xs: 0.5, sm: 1 } }}>
-                          {cardComponents[cardId]}
-                        </Box>
+                        {cardComponents[cardId]}
                       </Box>
                     </Grid>
                   )}
@@ -491,16 +499,22 @@ function Dashboard() {
           )}
         </Droppable>
 
-        {/* Second Row */}
-        <Droppable droppableId="second-row" direction="horizontal">
+        <Droppable droppableId="second-row">
           {(provided) => (
             <Grid 
               container 
-              spacing={1}
+              spacing={2}
               sx={{ 
+                mb: { xs: 3, sm: 4 },
                 mx: 0,
                 width: '100%',
                 overflow: 'hidden',
+                alignItems: 'stretch',
+                px: { xs: 1.5, sm: 3 },
+                '& .MuiPaper-root': {  // Ensure consistent shadow on all sides
+                  boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.05)',
+                  borderRadius: 1
+                }
               }}
               {...provided.droppableProps}
               ref={provided.innerRef}
@@ -519,14 +533,12 @@ function Dashboard() {
                       <Box 
                         {...provided.dragHandleProps}
                         sx={{
+                          height: '100%',
                           transition: 'transform 0.2s',
                           transform: snapshot.isDragging ? 'scale(1.02)' : 'none',
-                          height: '100%'
                         }}
                       >
-                        <Box sx={{ p: { xs: 0.5, sm: 1 } }}>
-                          {cardComponents[cardId]}
-                        </Box>
+                        {cardComponents[cardId]}
                       </Box>
                     </Grid>
                   )}
@@ -547,6 +559,7 @@ function Dashboard() {
           mx: 0,
           width: '100%',
           overflow: 'hidden',
+          px: { xs: 1.5, sm: 3 }
         }}
       >
         <Grid item xs={12}>
@@ -557,13 +570,15 @@ function Dashboard() {
             flexDirection: 'column',
             mb: { xs: 2, sm: 3 },
             overflow: 'hidden',
+            boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.05)',  // Match the cards' shadow
+            borderRadius: 1
           }}>
             <Typography variant="h6" color="text.secondary" gutterBottom>
               Counterparty Exposure
             </Typography>
             {loading ? (
               <Box display="flex" justifyContent="center" alignItems="center" height="80%">
-                <CircularProgress sx={{ color: '#4ade80' }} />
+                <CircularProgress sx={{ color: '#3b82f6' }} />
               </Box>
             ) : metrics.exposureData.length > 0 ? (
               <Box sx={{ flex: 1, position: 'relative' }}>
@@ -628,6 +643,7 @@ function Dashboard() {
           mx: 0,
           width: '100%',
           overflow: 'hidden',
+          px: { xs: 1.5, sm: 3 }
         }}
       >
         <Grid item xs={12}>

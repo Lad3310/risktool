@@ -119,6 +119,61 @@ function SettlementFailsReport() {
             color="text.secondary"
             sx={{ minWidth: '80px' }}
           >
+            CUSIP
+          </Typography>
+          <Typography 
+            variant="subtitle2" 
+            sx={{ 
+              fontWeight: 500,
+              maxWidth: '60%',
+              wordBreak: 'break-word'
+            }}
+          >
+            {fail.cusip}
+          </Typography>
+        </Box>
+        
+        <Box sx={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'flex-start',
+          borderBottom: '1px solid rgba(0, 0, 0, 0.08)',
+          pb: 1,
+          flexWrap: 'wrap',
+        }}>
+          <Typography 
+            variant="subtitle2" 
+            color="text.secondary"
+            sx={{ minWidth: '80px' }}
+          >
+            Type
+          </Typography>
+          <Typography 
+            variant="subtitle2" 
+            sx={{ 
+              fontWeight: 500,
+              maxWidth: '60%',
+              wordBreak: 'break-word',
+              color: fail.buy_sell_indicator?.toLowerCase() === 'buy' ? 'success.main' : 'error.main'
+            }}
+          >
+            {fail.buy_sell_indicator}
+          </Typography>
+        </Box>
+        
+        <Box sx={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'flex-start',
+          borderBottom: '1px solid rgba(0, 0, 0, 0.08)',
+          pb: 1,
+          flexWrap: 'wrap',
+        }}>
+          <Typography 
+            variant="subtitle2" 
+            color="text.secondary"
+            sx={{ minWidth: '80px' }}
+          >
             Date
           </Typography>
           <Typography 
@@ -333,6 +388,8 @@ function SettlementFailsReport() {
                 <TableHead>
                   <TableRow>
                     <TableCell>Counterparty</TableCell>
+                    <TableCell>CUSIP</TableCell>
+                    <TableCell>Type</TableCell>
                     <TableCell>Date</TableCell>
                     <TableCell>Days</TableCell>
                     <TableCell align="right">Value</TableCell>
@@ -343,6 +400,17 @@ function SettlementFailsReport() {
                   {paginatedFails.map(fail => (
                     <TableRow key={fail.id}>
                       <TableCell>{fail.counterparty_name}</TableCell>
+                      <TableCell>{fail.cusip}</TableCell>
+                      <TableCell>
+                        <Typography
+                          sx={{
+                            color: fail.buy_sell_indicator?.toLowerCase() === 'buy' ? 'success.main' : 'error.main',
+                            fontWeight: 500
+                          }}
+                        >
+                          {fail.buy_sell_indicator}
+                        </Typography>
+                      </TableCell>
                       <TableCell>{formatDate(fail.settlement_date)}</TableCell>
                       <TableCell>{fail.fail_days}</TableCell>
                       <TableCell align="right">

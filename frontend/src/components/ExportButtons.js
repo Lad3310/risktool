@@ -199,51 +199,28 @@ function ExportButtons({ data, filename = 'report' }) {
 
   return (
     <Box sx={{ display: 'flex', gap: 1, flexDirection: { xs: 'column', sm: 'row' } }}>
-      <Button 
-        onClick={exportToCSV}
-        startIcon={<FileDownloadIcon />}
-        variant="contained"
-        fullWidth
-        size="large"
-        sx={{ 
-          backgroundColor: '#4ade80',
-          '&:hover': { backgroundColor: '#22c55e' },
-          fontSize: { xs: '0.875rem', sm: '1rem' },
-          py: { xs: 1, sm: 1.5 }
-        }}
-      >
-        CSV
-      </Button>
-      <Button 
-        onClick={exportToXLSX}
-        startIcon={<FileDownloadIcon />}
-        variant="contained"
-        fullWidth
-        size="large"
-        sx={{ 
-          backgroundColor: '#4ade80',
-          '&:hover': { backgroundColor: '#22c55e' },
-          fontSize: { xs: '0.875rem', sm: '1rem' },
-          py: { xs: 1, sm: 1.5 }
-        }}
-      >
-        XLSX
-      </Button>
-      <Button 
-        onClick={exportToPDF}
-        startIcon={<FileDownloadIcon />}
-        variant="contained"
-        fullWidth
-        size="large"
-        sx={{ 
-          backgroundColor: '#4ade80',
-          '&:hover': { backgroundColor: '#22c55e' },
-          fontSize: { xs: '0.875rem', sm: '1rem' },
-          py: { xs: 1, sm: 1.5 }
-        }}
-      >
-        PDF
-      </Button>
+      {[
+        { label: 'CSV', onClick: exportToCSV },
+        { label: 'XLSX', onClick: exportToXLSX },
+        { label: 'PDF', onClick: exportToPDF }
+      ].map((button) => (
+        <Button 
+          key={button.label}
+          onClick={button.onClick}
+          startIcon={<FileDownloadIcon />}
+          variant="contained"
+          fullWidth
+          size="large"
+          sx={{ 
+            backgroundColor: '#3b82f6',
+            '&:hover': { backgroundColor: '#2563eb' },
+            fontSize: { xs: '0.875rem', sm: '1rem' },
+            py: { xs: 1, sm: 1.5 }
+          }}
+        >
+          {button.label}
+        </Button>
+      ))}
     </Box>
   );
 }

@@ -140,7 +140,7 @@ export default function Navigation({ mobileOpen, setMobileOpen }) {
         elevation={0}
         sx={{ 
           zIndex: (theme) => theme.zIndex.drawer + 1,
-          backgroundColor: '#4ade80',
+          backgroundColor: '#3b82f6',
           width: '100%',
         }}
       >

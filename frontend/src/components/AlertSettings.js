@@ -10,7 +10,7 @@ import {
   Divider,
   Container
 } from '@mui/material';
-import { NotificationsActive, Email } from '@mui/icons-material';
+import { NotificationsActive, Email, Send } from '@mui/icons-material';
 import { supabase } from '../utils/supabaseClient';
 import { useAuth } from '../context/AuthContext';
 
@@ -119,6 +119,44 @@ const AlertSettings = () => {
     }
   };
 
+  const handleTestAlert = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch('/api/test-alert', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email,
+          trade_value: 1500000,  // Simulated value above threshold
+          trade_count: 12        // Simulated count above threshold
+        })
+      });
+      
+      const data = await response.json();
+      if (data.status === 'success') {
+        setStatus({
+          message: 'Test alert sent! Check your email.',
+          severity: 'success'
+        });
+      } else {
+        setStatus({
+          message: 'Error sending test alert: ' + data.message,
+          severity: 'error'
+        });
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      setStatus({
+        message: 'Failed to send test alert',
+        severity: 'error'
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (!user) {
     return (
       <Container maxWidth="md">
@@ -186,14 +224,26 @@ const AlertSettings = () => {
               helperText="Get notified when number of trades with a counterparty exceeds this number"
             />
 
-            <Button
-              type="submit"
-              variant="contained"
-              disabled={loading}
-              sx={{ mt: 2 }}
-            >
-              {loading ? 'Saving...' : 'Save Preferences'}
-            </Button>
+            <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
+              <Button
+                type="submit"
+                variant="contained"
+                disabled={loading}
+                fullWidth
+              >
+                {loading ? 'Saving...' : 'Save Preferences'}
+              </Button>
+
+              <Button
+                variant="contained"
+                onClick={handleTestAlert}
+                disabled={loading}
+                fullWidth
+                startIcon={<Send />}
+              >
+                Send Test Alert
+              </Button>
+            </Box>
 
             {status.message && (
               <Alert severity={status.severity} sx={{ mt: 2 }}>

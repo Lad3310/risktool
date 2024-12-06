@@ -362,12 +362,11 @@ function Reports() {
         <Button 
           fullWidth 
           variant="contained" 
-          color="primary"
-          onClick={handleGenerateReport}
           sx={{ 
-            bgcolor: '#4ade80',
-            '&:hover': { bgcolor: '#22c55e' }
+            bgcolor: '#3b82f6',
+            '&:hover': { bgcolor: '#2563eb' }
           }}
+          onClick={handleGenerateReport}
         >
           GENERATE REPORT
         </Button>
