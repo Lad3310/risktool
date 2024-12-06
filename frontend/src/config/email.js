@@ -1,7 +1,7 @@
 export const emailConfig = {
   sender: {
     name: 'Risk Monitoring',
-    email: 'noreply@risktool-one.vercel',
+    email: 'noreply@risktool-one.com',
   },
   templates: {
     confirmSignup: {
