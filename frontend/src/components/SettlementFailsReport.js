@@ -271,10 +271,38 @@ function SettlementFailsReport() {
           gap: 1,
           width: { xs: '100%', sm: 'auto' }
         }}>
-          <ExportButtons 
-            data={settlementFails}
-            filename="settlement-fails"
-          />
+          {settlementFails && settlementFails.length > 0 && (
+            <ExportButtons 
+              data={settlementFails}
+              filename="settlement-fails"
+              columnDefs={{
+                counterparty_name: { 
+                  header: 'Counterparty', 
+                  width: 120
+                },
+                settlement_date: { 
+                  header: 'Date', 
+                  width: 80,
+                  format: (val) => formatDate(val)
+                },
+                fail_days: { 
+                  header: 'Days', 
+                  width: 60
+                },
+                net_money: { 
+                  header: 'Value', 
+                  width: 100,
+                  format: (val) => formatCurrency(Math.abs(val))
+                },
+                fail_cost: { 
+                  header: 'Cost', 
+                  width: 100,
+                  format: (val) => formatCurrency(val)
+                }
+              }}
+              title="Settlement Fails Report"
+            />
+          )}
         </Box>
       </Box>
       

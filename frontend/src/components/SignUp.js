@@ -23,13 +23,14 @@ const SignUp = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const [showRequirements, setShowRequirements] = useState(true);
   const navigate = useNavigate();
 
   // Password requirements
   const requirements = [
     { text: 'At least 6 characters long', test: (p) => p.length >= 6 },
     { text: 'Contains a letter', test: (p) => /[a-zA-Z]/.test(p) },
-    { text: 'Contains a number', test: (p) => /[0-9]/.test(p) },
+    { text: 'Contains a number', test: (p) => /\d/.test(p) },
   ];
 
   const handleSignUp = async (e) => {
@@ -46,88 +47,64 @@ const SignUp = () => {
       return;
     }
 
-    try {
-      console.log('Starting signup process for:', email);
-      
-      // First check if user already exists
-      const { data: existingUser } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('email', email)
-        .single();
+    // Proceed with account creation
+    handleCreateAccount();
+  };
 
-      if (existingUser) {
-        setError('An account with this email already exists');
-        return;
-      }
+  const handleCreateAccount = async () => {
+    // Validate password
+    if (isPasswordValid(password)) {
+      setShowRequirements(false); // Hide requirements if valid
 
-      // Attempt signup
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
-          data: {
-            email: email,
+      try {
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: `https://risktool-one.com/auth/callback`,
+            data: {
+              email: email,
+            }
+          }
+        });
+
+        if (error) {
+          setError(`Signup failed: ${error.message}`);
+          return;
+        }
+
+        if (data?.user) {
+          setSuccessMessage('Success! Please check your email for the confirmation link.');
+          setEmail('');
+          setPassword('');
+          
+          // Create profile record
+          const { error: profileError } = await supabase
+            .from('profiles')
+            .insert([
+              {
+                id: data.user.id,
+                email: email,
+                created_at: new Date().toISOString(),
+              }
+            ]);
+
+          if (profileError) {
+            console.error('Error creating profile:', profileError);
           }
         }
-      });
-
-      console.log('Signup response:', { data, error });
-
-      if (error) {
-        console.error('Detailed signup error:', {
-          message: error.message,
-          status: error.status,
-          details: error
-        });
-        
-        if (error.message.includes('already exists')) {
-          setError('An account with this email already exists. Please try logging in.');
-        } else if (error.message.includes('rate limit')) {
-          setError('Too many signup attempts. Please try again in a few minutes.');
-        } else if (error.message.includes('email')) {
-          setError('Error sending confirmation email. Please try again or contact support.');
-        } else {
-          setError(`Signup failed: ${error.message}`);
-        }
-        return;
+      } catch (error) {
+        setError('Unable to complete signup. Please try again later.');
+      } finally {
+        setLoading(false);
       }
-
-      if (data?.user) {
-        console.log('Signup successful:', data.user);
-        setSuccessMessage('Success! Please check your email for the confirmation link.');
-        setEmail('');
-        setPassword('');
-        
-        // Create profile record
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert([
-            {
-              id: data.user.id,
-              email: email,
-              created_at: new Date().toISOString(),
-            }
-          ]);
-
-        if (profileError) {
-          console.error('Error creating profile:', profileError);
-        }
-      } else {
-        console.warn('No user data in successful response:', data);
-        setError('Something went wrong. Please try again.');
-      }
-    } catch (error) {
-      console.error('Signup error:', {
-        message: error.message,
-        stack: error.stack,
-        error
-      });
-      setError('Unable to complete signup. Please try again later.');
-    } finally {
-      setLoading(false);
+    } else {
+      setShowRequirements(true); // Show requirements if invalid
     }
+  };
+
+  const isPasswordValid = (password) => {
+    return password.length >= 6 && /[a-zA-Z]/.test(password) && /\d/.test(password);
   };
 
   return (
@@ -169,32 +146,33 @@ const SignUp = () => {
             sx={{ mb: 2 }}
           />
 
-          {/* Password Requirements */}
-          <Box sx={{ mb: 3, bgcolor: 'grey.50', p: 2, borderRadius: 1 }}>
-            <Typography variant="subtitle2" gutterBottom>
-              Password Requirements:
-            </Typography>
-            <List dense>
-              {requirements.map((req, index) => (
-                <ListItem key={index} sx={{ py: 0 }}>
-                  <ListItemIcon sx={{ minWidth: 36 }}>
-                    {req.test(password) ? (
-                      <Check color="success" fontSize="small" />
-                    ) : (
-                      <Close color="error" fontSize="small" />
-                    )}
-                  </ListItemIcon>
-                  <ListItemText 
-                    primary={req.text}
-                    primaryTypographyProps={{
-                      variant: 'body2',
-                      color: req.test(password) ? 'success.main' : 'error.main'
-                    }}
-                  />
-                </ListItem>
-              ))}
-            </List>
-          </Box>
+          {showRequirements && (
+            <Box sx={{ mb: 3, bgcolor: 'grey.50', p: 2, borderRadius: 1 }}>
+              <Typography variant="subtitle2" gutterBottom>
+                Password Requirements:
+              </Typography>
+              <List dense>
+                {requirements.map((req, index) => (
+                  <ListItem key={index} sx={{ py: 0 }}>
+                    <ListItemIcon sx={{ minWidth: 36 }}>
+                      {req.test(password) ? (
+                        <Check color="success" fontSize="small" />
+                      ) : (
+                        <Close color="error" fontSize="small" />
+                      )}
+                    </ListItemIcon>
+                    <ListItemText 
+                      primary={req.text}
+                      primaryTypographyProps={{
+                        variant: 'body2',
+                        color: req.test(password) ? 'success.main' : 'error.main'
+                      }}
+                    />
+                  </ListItem>
+                ))}
+              </List>
+            </Box>
+          )}
 
           {error && (
             <Alert severity="error" sx={{ mb: 2 }}>
